@@ -125,9 +125,9 @@
                     minutes = "0" + minutes;
                 }
                 let message = {};
-                
+
                 let userLogin = firebase.auth().currentUser;
-                
+
                 if(userLogin !== null){
                     message = {
                     who: userLogin.displayName,
@@ -140,7 +140,8 @@
                     message = {
                     who: username.value,
                     text: messageInput.value,
-                    time: year + "-" + month + "-" + date + " " + hours + ":" + minutes,   
+                    time: year + "-" + month + "-" + date + " " + hours + ":" + minutes,
+                    photo: "http://www.freeiconspng.com/uploads/troll-face-png-20.png",
                     }
                 }
 
