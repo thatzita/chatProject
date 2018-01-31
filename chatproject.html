@@ -40,7 +40,7 @@
             }
             let myStorage = window.localStorage;
             let provider = new firebase.auth.GithubAuthProvider();
-
+            let login = document.getElementById("login");
 
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
@@ -51,6 +51,7 @@
                     alert("That is not a hackername, try again");
                 } else {
                     inlogg.style.display = "none";
+                    login.style.display = "none";
                     chatRuta.style.display = "block";
                     newUser.name = userValue;
                     myStorage.setItem('name', userValue);
@@ -63,7 +64,8 @@
             ////////////////////////////////////////////////////////////
 
             if (myStorage.getItem("name") !== null) {
-                inlogg.style.display = "none"
+                inlogg.style.display = "none";
+                login.style.display = "none";
                 chatRuta.style.display = "block"
                 username.value = myStorage.getItem("name")
             }
@@ -73,6 +75,7 @@
 
             logOut.addEventListener("click", function() {
                 inlogg.style.display = "block"
+                login.style.display = "block";
                 chatRuta.style.display = "none"
                 myStorage.removeItem("name");
             })
@@ -189,6 +192,7 @@
                     // The signed-in user info.
                     let user = result.user;
                     inlogg.style.display = "none";
+                    login.style.display = "none";
                     chatRuta.style.display = "block";
 
 
@@ -213,6 +217,7 @@
                 firebase.auth().signOut().then(function(result) {
                     console.log("Success! you are now logged out");
                     inlogg.style.display = "block"
+                    login.style.display = "block";
                     chatRuta.style.display = "none"
                 }).catch(function(error) {
                     console.log("Error, something happened");
@@ -291,7 +296,7 @@
             height: 50px;
             width: 50px;
         }
-        .login {
+        #login {
             padding-top: 5em;
             text-align: center;
         }
@@ -306,7 +311,7 @@
         <h2>Welcome to HackermanChat</h2>
     </div>
     
-<div class="login">
+<div id="login">
             <h5>Write your hackername to enter our chat.</h5>
 
 
