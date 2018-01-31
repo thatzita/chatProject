@@ -25,6 +25,7 @@
 
             const db = firebase.database();
             let enter = document.getElementById("enter");
+            let enterGithub = document.getElementById("enterGitbug");
             let username = document.getElementById("username");
             let inlogg = document.getElementById("inlogg");
             let body = document.getElementsByTagName("body")[0];
@@ -37,6 +38,8 @@
                 name: ""
             }
             let myStorage = window.localStorage;
+
+            let provider = new firebase.auth.GithubAuthProvider();
 
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
@@ -160,10 +163,32 @@
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
 
+            enterGithub.addEventListener("click", function() {
+
+                firebase.auth().signInWithPopup(provider).then(function(result) {
+                    // This gives you a GitHub Access Token. You can use it to access the GitHub API.
+                    let token = result.credential.accessToken;
+                    // The signed-in user info.
+                    let user = result.user;
+                    
+                    inlogg.style.display = "none";
+                    
+                    chatRuta.style.display = "block";
+                    // ...
+                }).catch(function(error) {
+                    // Handle Errors here.
+                    let errorCode = error.code;
+                    let errorMessage = error.message;
+                    // The email of the user's account used.
+                    let email = error.email;
+                    // The firebase.auth.AuthCredential type that was used.
+                    let credential = error.credential;
+                    // ...
+                });
+            })
+            ////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////
         }
-
-
-
     </script>
     <style>
         * {
@@ -231,7 +256,6 @@
             padding-right: 10px;
             margin-bottom: 10px;
         }
-
     </style>
 </head>
 
@@ -246,6 +270,7 @@
 
         <input type="text" placeholder="Username" id="username">
         <button id="enter">Enter Chat</button>
+        <button id="enterGithub">Login with Github</button>
 
 
     </div>
