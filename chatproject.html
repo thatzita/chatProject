@@ -25,7 +25,7 @@
 
             const db = firebase.database();
             let enter = document.getElementById("enter");
-            let enterGithub = document.getElementById("enterGitbug");
+            let enterGithub = document.getElementById("enterGithub");
             let username = document.getElementById("username");
             let inlogg = document.getElementById("inlogg");
             let body = document.getElementsByTagName("body")[0];
@@ -34,12 +34,13 @@
             let messageInput = document.getElementById("messageInput");
             let ul = document.getElementById("ul");
             let logOut = document.getElementById("logOut");
+            let logOutGithub = document.getElementById("logOutGithub");
             let newUser = {
                 name: ""
             }
             let myStorage = window.localStorage;
-
             let provider = new firebase.auth.GithubAuthProvider();
+
 
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
@@ -50,10 +51,11 @@
                     alert("That is not a hackername, try again");
                 } else {
                     inlogg.style.display = "none";
+                    chatRuta.style.display = "block";
                     newUser.name = userValue;
                     myStorage.setItem('name', userValue);
                     db.ref("/users/" + userValue).set(userValue);
-                    chatRuta.style.display = "block";
+
                 }
             }
 
@@ -103,6 +105,8 @@
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
 
+
+
             function clickAway() {
                 let theTime = new Date();
                 let year = theTime.getFullYear();
@@ -120,17 +124,30 @@
                 if (minutes < 10) {
                     minutes = "0" + minutes;
                 }
-
-                let message = {
-                    who: username.value,
+                let message = {};
+                
+                let userLogin = firebase.auth().currentUser;
+                
+                if(userLogin !== null){
+                    message = {
+                    who: userLogin.displayName,
                     text: messageInput.value,
                     time: year + "-" + month + "-" + date + " " + hours + ":" + minutes,
+                    }
+                }
+                else{
+                    message = {
+                    who: username.value,
+                    text: messageInput.value,
+                    time: year + "-" + month + "-" + date + " " + hours + ":" + minutes,   
+                    }
                 }
 
                 if (messageInput.value !== "") {
                     db.ref("/messages").push(message);
                 }
                 messageInput.value = "";
+
             }
 
             ////////////////////////////////////////////////////////////
@@ -164,17 +181,18 @@
             ////////////////////////////////////////////////////////////
 
             enterGithub.addEventListener("click", function() {
-
                 firebase.auth().signInWithPopup(provider).then(function(result) {
                     // This gives you a GitHub Access Token. You can use it to access the GitHub API.
                     let token = result.credential.accessToken;
                     // The signed-in user info.
                     let user = result.user;
-                    
+                    console.log(user);
+                    let gitUser = user.displayName;
+
                     inlogg.style.display = "none";
-                    
                     chatRuta.style.display = "block";
-                    // ...
+
+
                 }).catch(function(error) {
                     // Handle Errors here.
                     let errorCode = error.code;
@@ -183,12 +201,28 @@
                     let email = error.email;
                     // The firebase.auth.AuthCredential type that was used.
                     let credential = error.credential;
-                    // ...
+                    console.log(errorMessage)
+                });
+            })
+
+            ////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////
+
+            logOutGithub.addEventListener("click", function() {
+
+
+                firebase.auth().signOut().then(function(result) {
+                    console.log("Success! you are now logged out");
+                    inlogg.style.display = "block"
+                    chatRuta.style.display = "none"
+                }).catch(function(error) {
+                    console.log("Error, something happened");
                 });
             })
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
         }
+
     </script>
     <style>
         * {
@@ -256,6 +290,7 @@
             padding-right: 10px;
             margin-bottom: 10px;
         }
+
     </style>
 </head>
 
@@ -281,6 +316,7 @@
             <input id="messageInput" type="text" placeholder="Type your hack...">
             <button id="sendMessage">Send</button>
             <button id="logOut">Logga ut</button>
+            <button id="logOutGithub">Logout Github</button>
         </div>
         <div id="ett">
             <ul id="ul">
