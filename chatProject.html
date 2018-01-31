@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to labChat</title>
+
+    <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase.js"></script>
+    <script>
+        window.onload = function() {
+            // Initialize Firebase
+            var config = {
+                apiKey: "AIzaSyDhTNaNFi_b_CVFA6sdcqAvpjPL_ums0Go",
+                authDomain: "mychatprojectjs2.firebaseapp.com",
+                databaseURL: "https://mychatprojectjs2.firebaseio.com",
+                projectId: "mychatprojectjs2",
+                storageBucket: "mychatprojectjs2.appspot.com",
+                messagingSenderId: "1072451775566"
+            };
+            firebase.initializeApp(config);
+
+            ////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////
+
+            const db = firebase.database();
+            let enter = document.getElementById("enter");
+            let username = document.getElementById("username");
+            let inlogg = document.getElementById("inlogg");
+            let body = document.getElementsByTagName("body")[0];
+            let chatRuta = document.getElementsByClassName("chatRuta")[0];
+            let sendMessage = document.getElementById("sendMessage");
+            let messageInput = document.getElementById("messageInput");
+            let ul = document.getElementById("ul");
+            let logOut = document.getElementById("logOut");
+            let newUser = {
+                name: ""
+            }
+            let myStorage = window.localStorage;
+
+            ////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////
+
+            let chatRutaBool = false; // Kollar om vi har klickat enter. Så den inte gör om det.
+            function userCheck(userValue) {
+                if (username.value === "") {
+                    alert("That is not a hackername, try again");
+                } else {
+                    inlogg.style.display = "none";
+                    newUser.name = userValue;
+                    myStorage.setItem('name', userValue);
+                    db.ref("/users/" + userValue).set(userValue);
+                    chatRuta.style.display = "block";
+                }
+            }
+
+            ////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////
+
+            if (myStorage.getItem("name") !== null) {
+                inlogg.style.display = "none"
+                chatRuta.style.display = "block"
+                username.value = myStorage.getItem("name")
+            }
+
+            ////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////
+
+            logOut.addEventListener("click", function() {
+                inlogg.style.display = "block"
+                chatRuta.style.display = "none"
+                myStorage.removeItem("name");
+            })
+
+            ////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////
+
+            enter.addEventListener("click", function(e) {
+                e.preventDefault();
+                let clearUl = document.getElementsByTagName("ul");
+                ul.innerHTML = "";
+
+                if (chatRutaBool === false) {
+                    userCheck(username.value);
+                }
+            })
+
+            ////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////
+
+            username.addEventListener("keydown", function(e) {
+                if (chatRutaBool === false) {
+                    if (e.key === "Enter") {
+                        userCheck(username.value);
+                        chatRutaBool = true;
+                    }
+                }
+            })
+
+            ////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////
+
+            function clickAway() {
+                let theTime = new Date();
+                let year = theTime.getFullYear();
+                let month = theTime.getMonth();
+                let date = theTime.getDate();
+                month = month + 1;
+                if (month < 10) {
+                    month = "0" + month;
+                }
+                let hours = theTime.getHours();
+                if (hours < 10) {
+                    hours = "0" + hours;
+                }
+                let minutes = theTime.getMinutes();
+                if (minutes < 10) {
+                    minutes = "0" + minutes;
+                }
+
+                let message = {
+                    who: username.value,
+                    text: messageInput.value,
+                    time: year + "-" + month + "-" + date + " " + hours + ":" + minutes,
+                }
+
+                if (messageInput.value !== "") {
+                    db.ref("/messages").push(message);
+                }
+                messageInput.value = "";
+            }
+
+            ////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////
+
+            sendMessage.addEventListener("click", function() {
+                clickAway()
+            })
+
+            ////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////
+
+            messageInput.addEventListener("keydown", function(e) {
+                if (e.key === "Enter") {
+                    clickAway()
+                }
+            })
+
+            ////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////
+
+            db.ref("/messages").on("child_added", function(snapshot) {
+                let chatting = snapshot.val();
+                let li = document.createElement("li");
+                li.innerHTML = `<strong>${chatting.who}</strong>&nbsp<em>${chatting.time}</em><br>
+            ${chatting.text}`
+                ul.appendChild(li);
+            })
+
+            ////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////
+
+        }
+
+
+
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #inlogg {
+            margin: auto;
+            width: 50%;
+            background: gray;
+            text-align: center;
+        }
+
+        .chatRuta {
+
+            width: 500px;
+            position: relative;
+            top: 100px;
+            margin: auto;
+            display: none;
+            transform: rotatex(180deg);
+
+
+        }
+
+        #message {
+            position: relative;
+            bottom: 0;
+        }
+
+        #ett {
+            height: 500px;
+            width: 500px;
+            background: gray;
+            overflow: scroll;
+            overflow-x: hidden;
+            border-radius: 0 40px;
+
+
+        }
+
+        #ul {
+            float: left;
+            list-style: none;
+            transform: rotatex(180deg);
+
+
+
+        }
+
+        #tva {
+            transform: rotatex(180deg);
+
+        }
+
+        #ul>li {
+            width: inherit;
+            background-color: whitesmoke;
+            border-radius: 3px 3px 2px 2px;
+            width: 450px;
+            overflow-wrap: break-word;
+            padding: 5px;
+            padding-left: 10px;
+            padding-right: 10px;
+            margin-bottom: 10px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="inlogg">
+        <h2>Welcome to HackermanChat</h2>
+
+        <h5>Write your hackername to enter our chat.</h5>
+
+
+
+
+        <input type="text" placeholder="Username" id="username">
+        <button id="enter">Enter Chat</button>
+
+
+    </div>
+
+
+    <div class="chatRuta">
+        <div id="tva">
+            <input id="messageInput" type="text" placeholder="Type your hack...">
+            <button id="sendMessage">Send</button>
+            <button id="logOut">Logga ut</button>
+        </div>
+        <div id="ett">
+            <ul id="ul">
+            </ul>
+        </div>
+
+    </div>
+
+</body>
+
+</html>
