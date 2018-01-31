@@ -170,11 +170,8 @@
                     let token = result.credential.accessToken;
                     // The signed-in user info.
                     let user = result.user;
-                    
-                    inlogg.style.display = "none";
-                    
-                    chatRuta.style.display = "block";
-                    // ...
+
+                    console.log(user);
                 }).catch(function(error) {
                     // Handle Errors here.
                     let errorCode = error.code;
@@ -183,7 +180,7 @@
                     let email = error.email;
                     // The firebase.auth.AuthCredential type that was used.
                     let credential = error.credential;
-                    // ...
+                    console.log(errorMessage)
                 });
             })
             ////////////////////////////////////////////////////////////
