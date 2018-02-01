@@ -36,15 +36,38 @@
             let logOut = document.getElementById("logOut");
             let logOutGithub = document.getElementById("logOutGithub");
             let logOutGmail = document.getElementById("logOutGmail")
+
             let newUser = {
                 name: ""
             }
             let myStorage = window.localStorage;
             let provider = new firebase.auth.GithubAuthProvider();
             let gmailprovider = new firebase.auth.GoogleAuthProvider();
+            var fbProvider = new firebase.auth.FacebookAuthProvider();
 
             let login = document.getElementById("login");
             let loginGmail = document.getElementById("enterGmail");
+            let loginFacebook = document.getElementById("enterFB")
+
+
+            loginFacebook.addEventListener("click",function(){
+                              firebase.auth().signInWithPopup(provider).then(function(result) {
+                  // This gives you a Facebook Access Token. You can use it to access the Facebook API.
+                  var token = result.credential.accessToken;
+                  // The signed-in user info.
+                  var user = result.user;
+                  // ...
+                }).catch(function(error) {
+                  // Handle Errors here.
+                  var errorCode = error.code;
+                  var errorMessage = error.message;
+                  // The email of the user's account used.
+                  var email = error.email;
+                  // The firebase.auth.AuthCredential type that was used.
+                  var credential = error.credential;
+                  // ...
+                });
+            })
 
             loginGmail.addEventListener("click",function(){
               firebase.auth().signInWithPopup(gmailprovider).then(function(result) {
@@ -362,7 +385,7 @@
 
         <button id="enterGithub">Login with Github</button>
         <button id="enterGmail">Login with Gmail</button>
-
+        <button id="enterFB">Log in with Facebook</button>
 
 </div>
 
