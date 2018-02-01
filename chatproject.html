@@ -35,12 +35,51 @@
             let ul = document.getElementById("ul");
             let logOut = document.getElementById("logOut");
             let logOutGithub = document.getElementById("logOutGithub");
+            let logOutGmail = document.getElementById("logOutGmail")
             let newUser = {
                 name: ""
             }
             let myStorage = window.localStorage;
             let provider = new firebase.auth.GithubAuthProvider();
+            let gmailprovider = new firebase.auth.GoogleAuthProvider();
 
+            let login = document.getElementById("login");
+            let loginGmail = document.getElementById("enterGmail");
+
+            loginGmail.addEventListener("click",function(){
+              firebase.auth().signInWithPopup(gmailprovider).then(function(result) {
+              // This gives you a Google Access Token. You can use it to access the Google API.
+              var token = result.credential.accessToken;
+              // The signed-in user info.
+              var user = result.user;
+              console.log(user)
+              inlogg.style.display = "none";
+              login.style.display = "none";
+              chatRuta.style.display = "block";
+              // ...
+              }).catch(function(error) {
+              // Handle Errors here.
+              var errorCode = error.code;
+              var errorMessage = error.message;
+              // The email of the user's account used.
+              var email = error.email;
+              // The firebase.auth.AuthCredential type that was used.
+              var credential = error.credential;
+              console.log(errorMessage)
+              // ...
+              });
+            })
+
+            logOutGmail.addEventListener("click",function(){
+              firebase.auth().signOut().then(function(){
+                console.log("logged out successfully")
+                inlogg.style.display = "block"
+                login.style.display = "block";
+                chatRuta.style.display = "none"
+              },function(error){
+                console.log("signOut Failed")
+              })
+            })
 
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
@@ -51,6 +90,7 @@
                     alert("That is not a hackername, try again");
                 } else {
                     inlogg.style.display = "none";
+                    login.style.display = "none";
                     chatRuta.style.display = "block";
                     newUser.name = userValue;
                     myStorage.setItem('name', userValue);
@@ -63,7 +103,8 @@
             ////////////////////////////////////////////////////////////
 
             if (myStorage.getItem("name") !== null) {
-                inlogg.style.display = "none"
+                inlogg.style.display = "none";
+                login.style.display = "none";
                 chatRuta.style.display = "block"
                 username.value = myStorage.getItem("name")
             }
@@ -73,6 +114,7 @@
 
             logOut.addEventListener("click", function() {
                 inlogg.style.display = "block"
+                login.style.display = "block";
                 chatRuta.style.display = "none"
                 myStorage.removeItem("name");
             })
@@ -189,6 +231,7 @@
                     // The signed-in user info.
                     let user = result.user;
                     inlogg.style.display = "none";
+                    login.style.display = "none";
                     chatRuta.style.display = "block";
 
 
@@ -213,6 +256,7 @@
                 firebase.auth().signOut().then(function(result) {
                     console.log("Success! you are now logged out");
                     inlogg.style.display = "block"
+                    login.style.display = "block";
                     chatRuta.style.display = "none"
                 }).catch(function(error) {
                     console.log("Error, something happened");
@@ -286,12 +330,13 @@
             padding-left: 10px;
             padding-right: 10px;
             margin-bottom: 10px;
+            margin-left: 0.5em;
         }
         img {
             height: 50px;
             width: 50px;
         }
-        .login {
+        #login {
             padding-top: 5em;
             text-align: center;
         }
@@ -305,8 +350,8 @@
     <div id="inlogg">
         <h2>Welcome to HackermanChat</h2>
     </div>
-    
-<div class="login">
+
+<div id="login">
             <h5>Write your hackername to enter our chat.</h5>
 
 
@@ -314,8 +359,9 @@
 
         <input type="text" placeholder="Username" id="username">
         <button id="enter">Enter Chat</button><br>
-        
+
         <button id="enterGithub">Login with Github</button>
+        <button id="enterGmail">Login with Gmail</button>
 
 
 </div>
@@ -326,6 +372,7 @@
             <button id="sendMessage">Send</button>
             <button id="logOut">Logga ut</button>
             <button id="logOutGithub">Logout Github</button>
+            <button id="logOutGmail">Logout Gmail</button>
         </div>
         <div id="ett">
             <ul id="ul">
