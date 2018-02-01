@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to labChat</title>
+
+    <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase.js"></script>
+    <script>
+        window.onload = function() {
+            // Initialize Firebase
+            var config = {
+                apiKey: "AIzaSyDhTNaNFi_b_CVFA6sdcqAvpjPL_ums0Go",
+                authDomain: "mychatprojectjs2.firebaseapp.com",
+                databaseURL: "https://mychatprojectjs2.firebaseio.com",
+                projectId: "mychatprojectjs2",
+                storageBucket: "mychatprojectjs2.appspot.com",
+                messagingSenderId: "1072451775566"
+            };
+            firebase.initializeApp(config);
+
+            ////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////
+
+            const db = firebase.database();
+            let enter = document.getElementById("enter");
+            let enterGithub = document.getElementById("enterGithub");
+            let username = document.getElementById("username");
+            let inlogg = document.getElementById("inlogg");
+            let body = document.getElementsByTagName("body")[0];
+            let chatRuta = document.getElementsByClassName("chatRuta")[0];
+            let sendMessage = document.getElementById("sendMessage");
+            let messageInput = document.getElementById("messageInput");
+            let ul = document.getElementById("ul");
+            let logOut = document.getElementById("logOut");
+
+            let myStorage = window.localStorage;
+
+
+
+            let provider = new firebase.auth.GithubAuthProvider();
+            let gmailprovider = new firebase.auth.GoogleAuthProvider();
+            let login = document.getElementById("login");
+
+            
+            let loginGmail = document.getElementById("enterGmail");
+            
+            let newUser = {
+                name: ""
+            }
+
+            loginGmail.addEventListener("click", function() {
+                firebase.auth().signInWithPopup(gmailprovider).then(function(result) {
+                    // This gives you a Google Access Token. You can use it to access the Google API.
+                    var token = result.credential.accessToken;
+                    // The signed-in user info.
+                    var user = result.user;
+
+                    ////
+                    inlogg.style.display = "block";
+                    login.style.display = "none";
+                    chatRuta.style.display = "block";
+
+                    // ...
+                }).catch(function(error) {
+                    // Handle Errors here.
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+                    // The email of the user's account used.
+                    var email = error.email;
+                    // The firebase.auth.AuthCredential type that was used.
+                    var credential = error.credential;
+                    console.log(errorMessage)
+                    // ...
+                });
+            })
+
+            function gmailLogout() {
+
+                firebase.auth().signOut().then(function() {
+                    console.log("logged out successfully")
+                    inlogg.style.display = "block"
+                    login.style.display = "block";
+                    chatRuta.style.display = "none"
+                }, function(error) {
+                    console.log("signOut Failed")
+                })
+
+
+            }
+
+            let chatRutaBool = false; // Kollar om vi har klickat enter. Så den inte gör om det.
+            function userCheck(userValue) {
+                if (username.value === "") {
+                    alert("That is not a hackername, try again");
+                } else {
+                    inlogg.style.display = "block";
+                    login.style.display = "none";
+                    chatRuta.style.display = "block";
+
+                    newUser.name = userValue;
+                    myStorage.setItem('name', userValue);
+                    db.ref("/users/" + userValue).set(userValue);
+
+                }
+            }
+
+            ////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////
+            function githubLogout() {
+                firebase.auth().signOut().then(function(result) {
+                    console.log("Success! you are now logged out");
+                    inlogg.style.display = "block"
+                    login.style.display = "block";
+                    chatRuta.style.display = "none";
+                    
+
+                }).catch(function(error) {
+                    console.log("Error, something happened");
+                });
+
+            }
+
+
+            function firstPageLogin() {
+                inlogg.style.display = "block"
+                login.style.display = "block";
+                
+                chatRuta.style.display = "none"
+                myStorage.removeItem("name");
+            }
+
+            function firstPageAuthLogin() {
+                inlogg.style.display = "block"
+                login.style.display = "block";
+                
+                chatRuta.style.display = "none"
+            }
+
+            ////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////
+
+
+            logOut.addEventListener("click", function() {
+                let currentUser = firebase.auth().currentUser;
+                if (currentUser === null) {
+                    console.log("firstPageLogin");
+                    firstPageLogin()
+                } else if (currentUser.providerData[0].providerId === "github.com") {
+                    console.log("GithubLogout");
+                    githubLogout();
+                    currentUser.delete().then(function() {
+                        console.log("User deleted");
+                    }).catch(function(error) {
+                        console.log("An error happened");
+                    });
+                    firstPageAuthLogin();
+                } else if (currentUser.providerData[0].providerId === "google.com") {
+                    console.log("GmailLogout");
+                    gmailLogout();
+                    currentUser.delete().then(function() {
+                        console.log("User deleted");
+                    }).catch(function(error) {
+                        console.log("An error happened");
+                    });
+                    firstPageAuthLogin();
+                }
+            })
+
+            ////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////
+
+            enter.addEventListener("click", function(e) {
+                e.preventDefault();
+                let clearUl = document.getElementsByTagName("ul");
+                ul.innerHTML = "";
+                if (chatRutaBool === false) {
+                    userCheck(username.value);
+                }
+            })
+
+            ////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////
+
+            username.addEventListener("keydown", function(e) {
+                if (chatRutaBool === false) {
+                    if (e.key === "Enter") {
+                        userCheck(username.value);
+                        chatRutaBool = true;
+                    }
+                }
+            })
+
+            ////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////
+
+
+
+            function clickAway() {
+                let theTime = new Date();
+                let year = theTime.getFullYear();
+                let month = theTime.getMonth();
+                let date = theTime.getDate();
+                month = month + 1;
+                if (month < 10) {
+                    month = "0" + month;
+                }
+                let hours = theTime.getHours();
+                if (hours < 10) {
+                    hours = "0" + hours;
+                }
+                let minutes = theTime.getMinutes();
+                if (minutes < 10) {
+                    minutes = "0" + minutes;
+                }
+                let message = {};
+
+                let userLogin = firebase.auth().currentUser;
+                if (userLogin !== null) {
+                    message = {
+                        who: userLogin.displayName,
+                        text: messageInput.value,
+                        time: year + "-" + month + "-" + date + " " + hours + ":" + minutes,
+                        photo: userLogin.photoURL,
+                    }
+                } else {
+                    message = {
+                        who: username.value,
+                        text: messageInput.value,
+                        time: year + "-" + month + "-" + date + " " + hours + ":" + minutes,
+                        photo: "http://www.freeiconspng.com/uploads/troll-face-png-20.png",
+                    }
+                }
+
+                if (messageInput.value !== "") {
+                    db.ref("/messages").push(message);
+                }
+                messageInput.value = "";
+
+            }
+
+            ////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////
+
+            sendMessage.addEventListener("click", function() {
+                clickAway();
+            })
+
+            ////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////
+
+            messageInput.addEventListener("keydown", function(e) {
+                if (e.key === "Enter") {
+                    clickAway();
+                }
+            })
+
+            ////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////
+
+            db.ref("/messages").on("child_added", function(snapshot) {
+                let chatting = snapshot.val();
+                let li = document.createElement("li");
+                li.innerHTML = `<img src="${chatting.photo}"/><strong>${chatting.who}</strong>&nbsp<em>${chatting.time}</em><br>
+            ${chatting.text}`
+                ul.appendChild(li);
+            })
+
+            ////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////
+
+            enterGithub.addEventListener("click", function() {
+                firebase.auth().signInWithPopup(provider).then(function(result) {
+                    // This gives you a GitHub Access Token. You can use it to access the GitHub API.
+                    let token = result.credential.accessToken;
+                    // The signed-in user info.
+                    let user = result.user;
+                    inlogg.style.display = "block";
+                    login.style.display = "none";
+                    chatRuta.style.display = "block";
+                }).catch(function(error) {
+                    // Handle Errors here.
+                    let errorCode = error.code;
+                    let errorMessage = error.message;
+                    // The email of the user's account used.
+                    let email = error.email;
+                    // The firebase.auth.AuthCredential type that was used.
+                    let credential = error.credential;
+                    console.log(errorMessage);
+                });
+            })
+        }
+
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #inlogg {
+            margin: auto;
+            width: 100%;
+            height: 5em;
+            background: gray;
+            text-align: center;
+        }
+
+        #inlogg>button {
+            float: right;
+            margin-right: 10px;
+        }
+
+        .chatRuta {
+            width: 500px;
+            position: relative;
+            top: 80px;
+            margin: auto;
+            display: none;
+            transform: rotatex(180deg);
+        }
+
+        #message {
+            position: relative;
+            bottom: 0;
+        }
+
+        #ett {
+            height: 600px;
+            width: 650px;
+            background: gray;
+            overflow: scroll;
+            overflow-x: hidden;
+            border-radius: 10 10px;
+        }
+
+        #ul {
+            float: left;
+            list-style: none;
+            transform: rotatex(180deg);
+
+
+
+        }
+
+        #tva {
+            transform: rotatex(180deg);
+
+        }
+
+        #ul>li {
+            width: inherit;
+            background-color: whitesmoke;
+            border-radius: 3px 3px 2px 2px;
+            width: 595px;
+            overflow-wrap: break-word;
+            padding: 5px;
+            padding-left: 10px;
+            padding-right: 10px;
+            margin-bottom: 10px;
+            margin-left: 0.5em;
+        }
+
+        img {
+            height: 50px;
+            width: 50px;
+
+        }
+
+        #login {
+            padding-top: 5em;
+            text-align: center;
+        }
+
+        #enterGithub {
+            margin-top: 2em;
+        }
+
+        #messageInput {
+            margin-top: 5px;
+            width: 550px;
+            height: 30px;
+            border-radius: 5px 5px;
+        }
+
+        #sendMessage {
+            left: 560px;
+            position: absolute;
+            border-radius: 5px;
+            background: #3498db;
+            color: #ffffff;
+            font-size: 20px;
+            padding: 5px 15px 5px 15px;
+            text-decoration: none;
+            top: 2px;
+        }
+
+        #sendMessage:hover {
+            text-decoration: none;
+            background: #3cb0fd;
+        }
+
+        .button {
+            font-size: 12px;
+            border-radius: 5px;
+            background: #3498db;
+            color: #ffffff;
+            /*            font-size: 20px;*/
+            padding: 1px 2px 1px 2px;
+            text-decoration: none;
+            /*            top: 2px;*/
+        }
+
+        .button:hover {
+            text-decoration: none;
+            background: #3cb0fd;
+        }
+
+        .red {
+            background-color: #990000;
+        }
+
+        .red:hover {
+            background-color: red;
+            text-decoration: none;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="inlogg">
+        <h2>Welcome to HackermanChat</h2>
+        <button id="logOut" class="button red">Logga ut</button>
+
+    </div>
+
+
+
+    <div id="login">
+        <h5>Write your hackername to enter our chat.</h5>
+
+
+
+
+        <input type="text" placeholder="Username" id="username">
+        <button id="enter" class="button">Enter Chat</button><br>
+
+        <button id="enterGithub" class="button">Login with Github</button>
+        <br>
+        <br>
+        <p>- OR -</p>
+        <br>
+        <button id="enterGmail" class="button">Login with Gmail</button>
+
+
+    </div>
+
+    <div class="chatRuta">
+        <div id="tva">
+            <input id="messageInput" type="text" placeholder="Type your hack...">
+            <button id="sendMessage" class="button">Send</button>
+
+        </div>
+        <div id="ett">
+            <ul id="ul">
+            </ul>
+        </div>
+
+    </div>
+
+</body>
+
+</html>
