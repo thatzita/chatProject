@@ -180,13 +180,6 @@
 
 
 
-            function firstPageAuthLogin() {
-                inlogg.style.display = "block"
-                login.style.display = "block";
-
-                chatRuta.style.display = "none"
-            }
-
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
 
@@ -194,8 +187,9 @@
             logOut.addEventListener("click", function() {
                 let currentUser = firebase.auth().currentUser;
                 if (currentUser === null) {
-                    console.log("firstPageLogin");
+
                     myStorage.removeItem("name");
+                    displayLogOut();
                 } else if (currentUser.providerData[0].providerId === "github.com") {
                     console.log("GithubLogout");
                     githubLogout();
