@@ -52,6 +52,24 @@
                 name: ""
             }
 
+
+          function displayLogIn(){
+            inlogg.style.display = "block";
+            login.style.display = "none";
+            chatRuta.style.display = "block";
+
+          }
+
+
+
+
+          function displayLogOut(){
+            inlogg.style.display = "block"
+            login.style.display = "block";
+            chatRuta.style.display = "none"
+
+          }
+
             loginFB.addEventListener("click",function(){
                 firebase.auth().signInWithPopup(fbProvider).then(function(result) {
                     // This gives you a Facebook Access Token. You can use it to access the Facebook API.
@@ -60,9 +78,7 @@
                     var user = result.user;
                     // ...
 
-                    inlogg.style.display = "block";
-                    login.style.display = "none";
-                    chatRuta.style.display = "block";
+                    displayLogIn()
                     console.log(firebase.auth().currentUser)
                   }).catch(function(error) {
                     // Handle Errors here.
@@ -89,9 +105,7 @@
                     var user = result.user;
 
                     ////
-                    inlogg.style.display = "block";
-                    login.style.display = "none";
-                    chatRuta.style.display = "block";
+                    displayLogIn()
 
                     // ...
                 }).catch(function(error) {
@@ -111,9 +125,9 @@
 
                 firebase.auth().signOut().then(function() {
                     console.log("logged out successfully")
-                    inlogg.style.display = "block"
-                    login.style.display = "block";
-                    chatRuta.style.display = "none"
+
+                    displayLogOut()
+
                 }, function(error) {
                     console.log("signOut Failed")
                 })
@@ -126,9 +140,9 @@
 
                 firebase.auth().signOut().then(function(){
                   console.log("logged out successfully")
-                  inlogg.style.display = "block"
-                  login.style.display = "block";
-                  chatRuta.style.display = "none"
+
+                  displayLogOut()
+
 
                 },function(error){
                   console.log("signOut Failed")
@@ -140,9 +154,7 @@
                 if (username.value === "") {
                     alert("That is not a hackername, try again");
                 } else {
-                    inlogg.style.display = "block";
-                    login.style.display = "none";
-                    chatRuta.style.display = "block";
+                    displayLogIn()
 
                     newUser.name = userValue;
                     myStorage.setItem('name', userValue);
@@ -156,9 +168,7 @@
             function githubLogout() {
                 firebase.auth().signOut().then(function(result) {
                     console.log("Success! you are now logged out");
-                    inlogg.style.display = "block"
-                    login.style.display = "block";
-                    chatRuta.style.display = "none";
+                    displayLogOut()
 
 
                 }).catch(function(error) {
@@ -168,13 +178,7 @@
             }
 
 
-            function firstPageLogin() {
-                inlogg.style.display = "block"
-                login.style.display = "block";
 
-                chatRuta.style.display = "none"
-                myStorage.removeItem("name");
-            }
 
             function firstPageAuthLogin() {
                 inlogg.style.display = "block"
@@ -191,7 +195,7 @@
                 let currentUser = firebase.auth().currentUser;
                 if (currentUser === null) {
                     console.log("firstPageLogin");
-                    firstPageLogin()
+                    myStorage.removeItem("name");
                 } else if (currentUser.providerData[0].providerId === "github.com") {
                     console.log("GithubLogout");
                     githubLogout();
@@ -200,7 +204,8 @@
                     }).catch(function(error) {
                         console.log("An error happened");
                     });
-                    firstPageAuthLogin();
+
+                    displayLogOut()
                 } else if (currentUser.providerData[0].providerId === "google.com") {
                     console.log("GmailLogout");
                     gmailLogout();
@@ -209,7 +214,7 @@
                     }).catch(function(error) {
                         console.log("An error happened");
                     });
-                    firstPageAuthLogin();
+                    displayLogOut()
                 }else if( currentUser.providerData[0].providerId === "facebook.com"){
                   console.log("facebookLogout");
                   facebookLogout();
@@ -330,9 +335,7 @@
                     let token = result.credential.accessToken;
                     // The signed-in user info.
                     let user = result.user;
-                    inlogg.style.display = "block";
-                    login.style.display = "none";
-                    chatRuta.style.display = "block";
+                    displayLogIn()
                 }).catch(function(error) {
                     // Handle Errors here.
                     let errorCode = error.code;
