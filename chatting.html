@@ -517,12 +517,12 @@
 
         #messageInput {
             margin-top: 5px;
-            width: 550px;
+            width: 500px;
             height: 30px;
             border-radius: 5px 5px;
         }
 
-        #sendMessage {
+       .tva > #sendMessage {
             left: 560px;
             position: absolute;
             border-radius: 5px;
@@ -532,9 +532,11 @@
             padding: 5px 15px 5px 15px;
             text-decoration: none;
             top: 2px;
+           width: 5em;
+           margin-top: 0px;
         }
 
-        #sendMessage:hover {
+       .tva > #sendMessage:hover {
             text-decoration: none;
             background: #3cb0fd;
         }
@@ -551,17 +553,33 @@
             border-radius: 10px;
             background: #3498db;
             color: #ffffff;
-            /*            font-size: 20px;*/
             padding: 10px 15px 10px 15px;
             text-decoration: none;
-            /*            top: 2px;*/
             font-family: 'Vollkorn', serif;
             margin-top: 5px;
             width: 13em;
             height: 3em;
+            
         }
+.buttonSend {
+            font-size: 12px;
+            border-radius: 10px;
+            background: #3498db;
+            color: #ffffff;
+            padding: 10px 15px 10px 15px;
+            text-decoration: none;
+            font-family: 'Vollkorn', serif;
+            margin-top: 5px;
+            width: 11em;
+            height: 3em;
+            position: absolute;
+    right: -145px;
+    top: 0px;
+        }
+        .buttonSend:hover {
+            background: #3cb0fd;
 
-
+        }
 
         .button:hover {
             text-decoration: none;
@@ -569,6 +587,7 @@
             margin-top: 5px;
 
         }
+        
 
         .red {
             background-color: #990000;
@@ -583,6 +602,7 @@
 
         #username {
             height: 30px;
+            
         }
     </style>
 </head>
@@ -617,7 +637,7 @@
     <div class="chatRuta">
         <div id="tva">
             <input id="messageInput" type="text" placeholder="Type your hack...">
-            <button id="sendMessage" class="button">Send</button>
+            <button id="sendMessage" class="buttonSend">Send</button>
         </div>
         <div id="ett">
             <ul id="ul">
