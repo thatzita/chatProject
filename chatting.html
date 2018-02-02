@@ -41,14 +41,45 @@
 
             let provider = new firebase.auth.GithubAuthProvider();
             let gmailprovider = new firebase.auth.GoogleAuthProvider();
+            var fbProvider = new firebase.auth.FacebookAuthProvider();
+
             let login = document.getElementById("login");
 
-            
+
             let loginGmail = document.getElementById("enterGmail");
-            
+            let loginFB = document.getElementById("enterFB")
             let newUser = {
                 name: ""
             }
+
+            loginFB.addEventListener("click",function(){
+                firebase.auth().signInWithPopup(fbProvider).then(function(result) {
+                    // This gives you a Facebook Access Token. You can use it to access the Facebook API.
+                    var token = result.credential.accessToken;
+                    // The signed-in user info.
+                    var user = result.user;
+                    // ...
+
+                    inlogg.style.display = "block";
+                    login.style.display = "none";
+                    chatRuta.style.display = "block";
+                    console.log(firebase.auth().currentUser)
+                  }).catch(function(error) {
+                    // Handle Errors here.
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+                    // The email of the user's account used.
+                    var email = error.email;
+                    // The firebase.auth.AuthCredential type that was used.
+                    var credential = error.credential;
+                    // ...
+
+                    console.log(errorCode)
+                    console.log(errorMessage)
+                    console.log(email)
+                    console.log(credential)
+                  });
+              })
 
             loginGmail.addEventListener("click", function() {
                 firebase.auth().signInWithPopup(gmailprovider).then(function(result) {
@@ -90,6 +121,20 @@
 
             }
 
+
+            function facebookLogout(){
+
+                firebase.auth().signOut().then(function(){
+                  console.log("logged out successfully")
+                  inlogg.style.display = "block"
+                  login.style.display = "block";
+                  chatRuta.style.display = "none"
+
+                },function(error){
+                  console.log("signOut Failed")
+                })
+            }
+
             let chatRutaBool = false; // Kollar om vi har klickat enter. Så den inte gör om det.
             function userCheck(userValue) {
                 if (username.value === "") {
@@ -114,7 +159,7 @@
                     inlogg.style.display = "block"
                     login.style.display = "block";
                     chatRuta.style.display = "none";
-                    
+
 
                 }).catch(function(error) {
                     console.log("Error, something happened");
@@ -126,7 +171,7 @@
             function firstPageLogin() {
                 inlogg.style.display = "block"
                 login.style.display = "block";
-                
+
                 chatRuta.style.display = "none"
                 myStorage.removeItem("name");
             }
@@ -134,7 +179,7 @@
             function firstPageAuthLogin() {
                 inlogg.style.display = "block"
                 login.style.display = "block";
-                
+
                 chatRuta.style.display = "none"
             }
 
@@ -165,6 +210,15 @@
                         console.log("An error happened");
                     });
                     firstPageAuthLogin();
+                }else if( currentUser.providerData[0].providerId === "facebook.com"){
+                  console.log("facebookLogout");
+                  facebookLogout();
+                  currentUser.delete().then(function() {
+                      console.log("User deleted");
+                  }).catch(function(error) {
+                      console.log("An error happened");
+                  });
+
                 }
             })
 
@@ -229,7 +283,7 @@
                         who: username.value,
                         text: messageInput.value,
                         time: year + "-" + month + "-" + date + " " + hours + ":" + minutes,
-                        photo: "/trollface.png",
+                        photo: "trollface.png",
                     }
                 }
 
@@ -453,6 +507,8 @@
         <p>- OR -</p>
         <br>
         <button id="enterGmail" class="button">Login with Gmail</button>
+        <br>
+        <button id="enterFB">Login with Facebook</button>
 
 
     </div>

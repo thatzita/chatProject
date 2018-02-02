@@ -34,89 +34,71 @@
             let messageInput = document.getElementById("messageInput");
             let ul = document.getElementById("ul");
             let logOut = document.getElementById("logOut");
-            let logOutGithub = document.getElementById("logOutGithub");
-            let logOutGmail = document.getElementById("logOutGmail")
+
+            let myStorage = window.localStorage;
+
+
+
+            let provider = new firebase.auth.GithubAuthProvider();
+            let gmailprovider = new firebase.auth.GoogleAuthProvider();
+            let login = document.getElementById("login");
+
+
+            let loginGmail = document.getElementById("enterGmail");
 
             let newUser = {
                 name: ""
             }
-            let myStorage = window.localStorage;
-            let provider = new firebase.auth.GithubAuthProvider();
-            let gmailprovider = new firebase.auth.GoogleAuthProvider();
-            var fbProvider = new firebase.auth.FacebookAuthProvider();
 
-            let login = document.getElementById("login");
-            let loginGmail = document.getElementById("enterGmail");
-            let loginFacebook = document.getElementById("enterFB")
+            loginGmail.addEventListener("click", function() {
+                firebase.auth().signInWithPopup(gmailprovider).then(function(result) {
+                    // This gives you a Google Access Token. You can use it to access the Google API.
+                    var token = result.credential.accessToken;
+                    // The signed-in user info.
+                    var user = result.user;
 
-  console.log("klar")
-            loginFacebook.addEventListener("click",function(){
-                              firebase.auth().signInWithPopup(fbProvider).then(function(result) {
-                  // This gives you a Facebook Access Token. You can use it to access the Facebook API.
-                  var token = result.credential.accessToken;
-                  // The signed-in user info.
-                  var user = result.user;
-                  console.log(user)
-                  // ...
+                    ////
+                    inlogg.style.display = "block";
+                    login.style.display = "none";
+                    chatRuta.style.display = "block";
+
+                    // ...
                 }).catch(function(error) {
-                  // Handle Errors here.
-                  var errorCode = error.code;
-                  var errorMessage = error.message;
-                  // The email of the user's account used.
-                  var email = error.email;
-                  // The firebase.auth.AuthCredential type that was used.
-                  var credential = error.credential;
-                  // ...
-                  console.log(errorMessage)
+                    // Handle Errors here.
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+                    // The email of the user's account used.
+                    var email = error.email;
+                    // The firebase.auth.AuthCredential type that was used.
+                    var credential = error.credential;
+                    console.log(errorMessage)
+                    // ...
                 });
             })
 
-            loginGmail.addEventListener("click",function(){
-              firebase.auth().signInWithPopup(gmailprovider).then(function(result) {
-              // This gives you a Google Access Token. You can use it to access the Google API.
-              var token = result.credential.accessToken;
-              // The signed-in user info.
-              var user = result.user;
-              console.log(user)
-              inlogg.style.display = "none";
-              login.style.display = "none";
-              chatRuta.style.display = "block";
-              // ...
-              }).catch(function(error) {
-              // Handle Errors here.
-              var errorCode = error.code;
-              var errorMessage = error.message;
-              // The email of the user's account used.
-              var email = error.email;
-              // The firebase.auth.AuthCredential type that was used.
-              var credential = error.credential;
-              console.log(errorMessage)
-              // ...
-              });
-            })
+            function gmailLogout() {
 
-            logOutGmail.addEventListener("click",function(){
-              firebase.auth().signOut().then(function(){
-                console.log("logged out successfully")
-                inlogg.style.display = "block"
-                login.style.display = "block";
-                chatRuta.style.display = "none"
-              },function(error){
-                console.log("signOut Failed")
-              })
-            })
+                firebase.auth().signOut().then(function() {
+                    console.log("logged out successfully")
+                    inlogg.style.display = "block"
+                    login.style.display = "block";
+                    chatRuta.style.display = "none"
+                }, function(error) {
+                    console.log("signOut Failed")
+                })
 
-            ////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////
+
+            }
 
             let chatRutaBool = false; // Kollar om vi har klickat enter. Så den inte gör om det.
             function userCheck(userValue) {
                 if (username.value === "") {
                     alert("That is not a hackername, try again");
                 } else {
-                    inlogg.style.display = "none";
+                    inlogg.style.display = "block";
                     login.style.display = "none";
                     chatRuta.style.display = "block";
+
                     newUser.name = userValue;
                     myStorage.setItem('name', userValue);
                     db.ref("/users/" + userValue).set(userValue);
@@ -126,22 +108,64 @@
 
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
+            function githubLogout() {
+                firebase.auth().signOut().then(function(result) {
+                    console.log("Success! you are now logged out");
+                    inlogg.style.display = "block"
+                    login.style.display = "block";
+                    chatRuta.style.display = "none";
 
-            if (myStorage.getItem("name") !== null) {
-                inlogg.style.display = "none";
-                login.style.display = "none";
-                chatRuta.style.display = "block"
-                username.value = myStorage.getItem("name")
+
+                }).catch(function(error) {
+                    console.log("Error, something happened");
+                });
+
+            }
+
+
+            function firstPageLogin() {
+                inlogg.style.display = "block"
+                login.style.display = "block";
+
+                chatRuta.style.display = "none"
+                myStorage.removeItem("name");
+            }
+
+            function firstPageAuthLogin() {
+                inlogg.style.display = "block"
+                login.style.display = "block";
+
+                chatRuta.style.display = "none"
             }
 
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
 
+
             logOut.addEventListener("click", function() {
-                inlogg.style.display = "block"
-                login.style.display = "block";
-                chatRuta.style.display = "none"
-                myStorage.removeItem("name");
+                let currentUser = firebase.auth().currentUser;
+                if (currentUser === null) {
+                    console.log("firstPageLogin");
+                    firstPageLogin()
+                } else if (currentUser.providerData[0].providerId === "github.com") {
+                    console.log("GithubLogout");
+                    githubLogout();
+                    currentUser.delete().then(function() {
+                        console.log("User deleted");
+                    }).catch(function(error) {
+                        console.log("An error happened");
+                    });
+                    firstPageAuthLogin();
+                } else if (currentUser.providerData[0].providerId === "google.com") {
+                    console.log("GmailLogout");
+                    gmailLogout();
+                    currentUser.delete().then(function() {
+                        console.log("User deleted");
+                    }).catch(function(error) {
+                        console.log("An error happened");
+                    });
+                    firstPageAuthLogin();
+                }
             })
 
             ////////////////////////////////////////////////////////////
@@ -151,7 +175,6 @@
                 e.preventDefault();
                 let clearUl = document.getElementsByTagName("ul");
                 ul.innerHTML = "";
-
                 if (chatRutaBool === false) {
                     userCheck(username.value);
                 }
@@ -194,21 +217,19 @@
                 let message = {};
 
                 let userLogin = firebase.auth().currentUser;
-
-                if(userLogin !== null){
+                if (userLogin !== null) {
                     message = {
-                    who: userLogin.displayName,
-                    text: messageInput.value,
-                    time: year + "-" + month + "-" + date + " " + hours + ":" + minutes,
-                    photo: userLogin.photoURL,
+                        who: userLogin.displayName,
+                        text: messageInput.value,
+                        time: year + "-" + month + "-" + date + " " + hours + ":" + minutes,
+                        photo: userLogin.photoURL,
                     }
-                }
-                else{
+                } else {
                     message = {
-                    who: username.value,
-                    text: messageInput.value,
-                    time: year + "-" + month + "-" + date + " " + hours + ":" + minutes,
-                    photo: "http://www.freeiconspng.com/uploads/troll-face-png-20.png",
+                        who: username.value,
+                        text: messageInput.value,
+                        time: year + "-" + month + "-" + date + " " + hours + ":" + minutes,
+                        photo: "http://www.freeiconspng.com/uploads/troll-face-png-20.png",
                     }
                 }
 
@@ -223,7 +244,7 @@
             ////////////////////////////////////////////////////////////
 
             sendMessage.addEventListener("click", function() {
-                clickAway()
+                clickAway();
             })
 
             ////////////////////////////////////////////////////////////
@@ -231,7 +252,7 @@
 
             messageInput.addEventListener("keydown", function(e) {
                 if (e.key === "Enter") {
-                    clickAway()
+                    clickAway();
                 }
             })
 
@@ -255,11 +276,9 @@
                     let token = result.credential.accessToken;
                     // The signed-in user info.
                     let user = result.user;
-                    inlogg.style.display = "none";
+                    inlogg.style.display = "block";
                     login.style.display = "none";
                     chatRuta.style.display = "block";
-
-
                 }).catch(function(error) {
                     // Handle Errors here.
                     let errorCode = error.code;
@@ -268,27 +287,9 @@
                     let email = error.email;
                     // The firebase.auth.AuthCredential type that was used.
                     let credential = error.credential;
-                    console.log(errorMessage)
+                    console.log(errorMessage);
                 });
             })
-
-            ////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////
-
-            logOutGithub.addEventListener("click", function() {
-
-
-                firebase.auth().signOut().then(function(result) {
-                    console.log("Success! you are now logged out");
-                    inlogg.style.display = "block"
-                    login.style.display = "block";
-                    chatRuta.style.display = "none"
-                }).catch(function(error) {
-                    console.log("Error, something happened");
-                });
-            })
-            ////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////
         }
 
     </script>
@@ -306,10 +307,15 @@
             text-align: center;
         }
 
+        #inlogg>button {
+            float: right;
+            margin-right: 10px;
+        }
+
         .chatRuta {
             width: 500px;
             position: relative;
-            top: 100px;
+            top: 80px;
             margin: auto;
             display: none;
             transform: rotatex(180deg);
@@ -321,14 +327,12 @@
         }
 
         #ett {
-            height: 500px;
-            width: 500px;
+            height: 600px;
+            width: 650px;
             background: gray;
             overflow: scroll;
             overflow-x: hidden;
-            border-radius: 0 40px;
-
-
+            border-radius: 10 10px;
         }
 
         #ul {
@@ -349,7 +353,7 @@
             width: inherit;
             background-color: whitesmoke;
             border-radius: 3px 3px 2px 2px;
-            width: 450px;
+            width: 595px;
             overflow-wrap: break-word;
             padding: 5px;
             padding-left: 10px;
@@ -357,47 +361,107 @@
             margin-bottom: 10px;
             margin-left: 0.5em;
         }
+
         img {
             height: 50px;
             width: 50px;
+
         }
+
         #login {
             padding-top: 5em;
             text-align: center;
         }
+
         #enterGithub {
             margin-top: 2em;
         }
+
+        #messageInput {
+            margin-top: 5px;
+            width: 550px;
+            height: 30px;
+            border-radius: 5px 5px;
+        }
+
+        #sendMessage {
+            left: 560px;
+            position: absolute;
+            border-radius: 5px;
+            background: #3498db;
+            color: #ffffff;
+            font-size: 20px;
+            padding: 5px 15px 5px 15px;
+            text-decoration: none;
+            top: 2px;
+        }
+
+        #sendMessage:hover {
+            text-decoration: none;
+            background: #3cb0fd;
+        }
+
+        .button {
+            font-size: 12px;
+            border-radius: 5px;
+            background: #3498db;
+            color: #ffffff;
+            /*            font-size: 20px;*/
+            padding: 1px 2px 1px 2px;
+            text-decoration: none;
+            /*            top: 2px;*/
+        }
+
+        .button:hover {
+            text-decoration: none;
+            background: #3cb0fd;
+        }
+
+        .red {
+            background-color: #990000;
+        }
+
+        .red:hover {
+            background-color: red;
+            text-decoration: none;
+        }
+
     </style>
 </head>
 
 <body>
     <div id="inlogg">
         <h2>Welcome to HackermanChat</h2>
+        <button id="logOut" class="button red">Logga ut</button>
+
     </div>
 
-<div id="login">
-            <h5>Write your hackername to enter our chat.</h5>
+
+
+    <div id="login">
+        <h5>Write your hackername to enter our chat.</h5>
 
 
 
 
         <input type="text" placeholder="Username" id="username">
-        <button id="enter">Enter Chat</button><br>
+        <button id="enter" class="button">Enter Chat</button><br>
 
-        <button id="enterGithub">Login with Github</button>
-        <button id="enterGmail">Login with Gmail</button>
-        <button id="enterFB">Log in with Facebook</button>
+        <button id="enterGithub" class="button">Login with Github</button>
+        <br>
+        <br>
+        <p>- OR -</p>
+        <br>
+        <button id="enterGmail" class="button">Login with Gmail</button>
 
-</div>
+
+    </div>
 
     <div class="chatRuta">
         <div id="tva">
             <input id="messageInput" type="text" placeholder="Type your hack...">
-            <button id="sendMessage">Send</button>
-            <button id="logOut">Logga ut</button>
-            <button id="logOutGithub">Logout Github</button>
-            <button id="logOutGmail">Logout Gmail</button>
+            <button id="sendMessage" class="button">Send</button>
+
         </div>
         <div id="ett">
             <ul id="ul">
