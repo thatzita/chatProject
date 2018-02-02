@@ -180,7 +180,10 @@
 
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> aa3243bc394e6d0e53dece3b3856447d3f52ce78
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
 
@@ -188,8 +191,9 @@
             logOut.addEventListener("click", function() {
                 let currentUser = firebase.auth().currentUser;
                 if (currentUser === null) {
-                    console.log("firstPageLogin");
+
                     myStorage.removeItem("name");
+                    displayLogOut();
                 } else if (currentUser.providerData[0].providerId === "github.com") {
                     console.log("GithubLogout");
                     githubLogout();
