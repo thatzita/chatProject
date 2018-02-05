@@ -313,6 +313,8 @@
             db.ref("/messages").on("child_added", function(snapshot) {
                 let chatting = snapshot.val();
                 let li = document.createElement("li");
+                let img = document.createElement("img");
+                img.src=chatting.photo;
                 li.innerHTML = `<img src="${chatting.photo}"/><strong>${chatting.who}</strong>&nbsp<em>${chatting.time}</em><br>
             ${chatting.text}`
                 ul.appendChild(li);
@@ -486,17 +488,18 @@
             border-radius: 3px 3px 2px 2px;
             width: 595px;
             overflow-wrap: break-word;
-            padding: 5px;
-            padding-left: 10px;
-            padding-right: 10px;
+            padding-left: 3px;
+            padding-top: 3px;
+            padding-bottom: 10px;
             margin-bottom: 10px;
             margin-left: 0.5em;
             opacity: 1;
         }
 
         img {
-            height: 50px;
-            width: 50px;
+            height: 45px;
+            width: 45px;
+            float: left;
 
         }
 
