@@ -313,6 +313,8 @@
             db.ref("/messages").on("child_added", function(snapshot) {
                 let chatting = snapshot.val();
                 let li = document.createElement("li");
+                let img = document.createElement("img");
+                img.src=chatting.photo;
                 li.innerHTML = `<img src="${chatting.photo}"/><strong>${chatting.who}</strong>&nbsp<em>${chatting.time}</em><br>
             ${chatting.text}`
                 ul.appendChild(li);
@@ -441,9 +443,10 @@
         }
 
         .chatRuta {
-            width: 500px;
-            position: relative;
-            top: 25px;
+            position: absolute;
+            left: 20%;
+            top: 90px;
+            width: 100%;
             margin: auto;
             display: none;
             transform: rotatex(180deg);
@@ -457,9 +460,8 @@
         }
 
         #ett {
-            height: 600px;
-            width: 650px;
-            background: gray;
+            height: 500px;
+            width: 900px;
             overflow: scroll;
             overflow-x: hidden;
             border-radius: 10 10px;
@@ -482,22 +484,23 @@
         }
 
         #ul>li {
-            width: inherit;
+/*            width: inherit;*/
             background-color: whitesmoke;
             border-radius: 3px 3px 2px 2px;
-            width: 595px;
+            width: 845px;
             overflow-wrap: break-word;
-            padding: 5px;
-            padding-left: 10px;
-            padding-right: 10px;
+            padding-left: 3px;
+            padding-top: 3px;
+            padding-bottom: 10px;
             margin-bottom: 10px;
             margin-left: 0.5em;
             opacity: 1;
         }
 
         img {
-            height: 50px;
-            width: 50px;
+            height: 45px;
+            width: 45px;
+            float: left;
 
         }
 
@@ -534,12 +537,12 @@
 
         #messageInput {
             margin-top: 5px;
-            width: 550px;
+            width: 730px;
             height: 30px;
             border-radius: 5px 5px;
         }
 
-        #sendMessage {
+       .tva > #sendMessage {
             left: 560px;
             position: absolute;
             border-radius: 5px;
@@ -549,9 +552,11 @@
             padding: 5px 15px 5px 15px;
             text-decoration: none;
             top: 2px;
+           width: 5em;
+           margin-top: 0px;
         }
 
-        #sendMessage:hover {
+       .tva > #sendMessage:hover {
             text-decoration: none;
             background: #3cb0fd;
         }
@@ -567,23 +572,39 @@
             font-size: 12px;
             border-radius: 10px;
             color: #ffffff;
-            /*            font-size: 20px;*/
             padding: 10px 15px 10px 15px;
             text-decoration: none;
-            /*            top: 2px;*/
             font-family: 'Vollkorn', serif;
             margin-top: 5px;
             width: 13em;
             height: 3em;
+            
         }
+.buttonSend {
+            font-size: 12px;
+            border-radius: 10px;
+            background: #3498db;
+            color: #ffffff;
+            padding: 10px 15px 10px 15px;
+            text-decoration: none;
+            font-family: 'Vollkorn', serif;
+            margin-top: 5px;
+            width: 11em;
+            height: 3em;
+            position: relative;
+/*    top: 0px;*/
+        }
+        .buttonSend:hover {
+            background: #3cb0fd;
 
-
+        }
 
         .button:hover {
             text-decoration: none;
             margin-top: 5px;
 
         }
+        
 
         .red {
             background-color: rgba(255,255,255,0.2);
@@ -598,6 +619,7 @@
 
         #username {
             height: 30px;
+            
         }
     </style>
 </head>
@@ -632,7 +654,7 @@
     <div class="chatRuta">
         <div id="tva">
             <input id="messageInput" type="text" placeholder="Type your hack...">
-            <button id="sendMessage" class="button">Send</button>
+            <button id="sendMessage" class="buttonSend">Send</button>
         </div>
         <div id="ett">
             <ul id="ul">
