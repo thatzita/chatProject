@@ -302,7 +302,15 @@
                 }
 
                 if (messageInput.value !== "") {
-                    db.ref("/messages").push(message);
+                    let ref = db.ref("/messages").push(message);
+                    console.log(ref.key)
+
+                    firebase.database().ref('messages/'+ ref.key + '/like').on('child_changed', function(snapshot) {
+                            let obj = snapshot.val();
+                            console.log('child_changed', obj);
+
+                    })
+
                 }
                 messageInput.value = "";
 
@@ -347,10 +355,7 @@
                 ul.appendChild(li);
             })
 
-            firebase.database().ref('messages/like/').on('child_changed', function(snapshot) {
-            				let obj = snapshot.val();
-            				console.log('child_changed', obj);
-            			})
+
 //             db.ref('/text').on('value', function(snapshot) {
 // 	// Inträffar när ett objekt ändras.
 //             	let data = snapshot.val();
