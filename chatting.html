@@ -351,8 +351,13 @@
 
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
+
+
+
+
+
             let h4Up;
-            let hfDown
+            let h4Down
             let y = 0;
             db.ref("/messages").on("child_added", function(snapshot) {
                 let chatting = snapshot.val();
@@ -366,15 +371,42 @@
 
 
                 h4Up = document.createElement("h4");
+
+                h4Up.innerHTML = `<i class="arrow up pilUpp"></i>0`
+
+
+
+
+                h4Up.className = "h4Up"
                 h4Down = document.createElement("h4");
 
+h4Down.innerHTML = `<i class="arrow down"></i>0`
 
                 ul.appendChild(li);
                 li.appendChild(h4Up);
                 li.appendChild(h4Down)
                 console.log(li)
                 y++
+
+
+
             })
+
+            window.addEventListener("click",function(e){
+
+
+
+
+
+
+                  console.log(e.target)
+
+
+
+            })
+
+
+
 
 
             //             db.ref('/text').on('value', function(snapshot) {
