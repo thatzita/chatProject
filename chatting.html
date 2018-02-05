@@ -283,10 +283,8 @@
                         text: messageInput.value,
                         time: year + "-" + month + "-" + date + " " + hours + ":" + minutes,
                         photo: userLogin.photoURL,
-                        like:{
-                          upVote:0,
-                          downVote:0,
-                        }
+                        upVote:0,
+                        downVote:0
                     }
                 } else {
                     message = {
@@ -294,10 +292,8 @@
                         text: messageInput.value,
                         time: year + "-" + month + "-" + date + " " + hours + ":" + minutes,
                         photo: "trollface.png",
-                        like:{
-                          upVote:0,
-                          downVote:0,
-                        }
+                        upVote:0,
+                        downVote:0
                     }
                 }
 
@@ -305,16 +301,28 @@
                     let ref = db.ref("/messages").push(message);
                     console.log(ref.key)
 
-                    firebase.database().ref('messages/'+ ref.key + '/like').on('child_changed', function(snapshot) {
+                    firebase.database().ref('messages/'+ ref.key).on('child_changed', function(snapshot) {
                             let obj = snapshot.val();
-                            console.log('child_changed', obj);
+                            console.log('child_changed', obj.upVote);
 
-                          h4.innerHTML = `<i class="arrow up"></i> ${obj} <i class="arrow down"></i> ${obj}`
+                          h4Up.innerHTML = `<i class="arrow up"></i> ${obj}`
 
 
 
 
                     })
+
+                    firebase.database().ref('messages/'+ ref.key + "/downVote").on('child_changed', function(snapshot) {
+                            let obj = snapshot.val();
+                            console.log('child_changed', obj);
+
+                          h4Down.innerHTML = `<i class="arrow down"></i> ${obj}`
+
+
+
+
+                    })
+
 
                 }
                 messageInput.value = "";
@@ -344,7 +352,8 @@
 
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
-            let h4;
+            let h4Up;
+            let hfDown
             let y = 0;
             db.ref("/messages").on("child_added", function(snapshot) {
                 let chatting = snapshot.val();
@@ -357,11 +366,13 @@
             ${chatting.text} `
 
 
-                 h4 = document.createElement("h4");
+                 h4Up = document.createElement("h4");
+                 h4Down = document.createElement("h4");
 
 
                 ul.appendChild(li);
-                li.appendChild(h4)
+                li.appendChild(h4Up);
+                li.appendChild(h4Down)
                   console.log(li)
                 y++
             })
