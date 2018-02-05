@@ -52,6 +52,10 @@
                 name: ""
             }
 
+            /////////////////
+            let upVoteNr = 0;
+            let downVoteNr = 0;
+            ///////////////////////
 
             function displayLogIn() {
                 inlogg.style.display = "block";
@@ -71,12 +75,12 @@
             }
 
             firebase.auth().onAuthStateChanged(function(user) {
-            if (user) {
-              console.log("Inloggad")
-            } else {
-            console.log("utloggad")
+                if (user) {
+                    console.log("Inloggad")
+                } else {
+                    console.log("utloggad")
                 }
-            } );
+            });
 
 
             loginFB.addEventListener("click", function() {
@@ -283,8 +287,8 @@
                         text: messageInput.value,
                         time: year + "-" + month + "-" + date + " " + hours + ":" + minutes,
                         photo: userLogin.photoURL,
-                        upVote:0,
-                        downVote:0
+                        upVote: 0,
+                        downVote: 0
                     }
                 } else {
                     message = {
@@ -292,47 +296,39 @@
                         text: messageInput.value,
                         time: year + "-" + month + "-" + date + " " + hours + ":" + minutes,
                         photo: "trollface.png",
-                        upVote:0,
-                        downVote:0
+                        upVote: 0,
+                        downVote: 0
                     }
                 }
 
                 if (messageInput.value !== "") {
                     let ref = db.ref("/messages").push(message);
-                    console.log(ref.key)
+                    console.log(typeof ref.key)
 
-                    firebase.database().ref('messages/'+ ref.key).on('child_changed', function(snapshot) {
-                            let obj = snapshot.val();
-                            console.log('child_changed', obj.upVote);
+                    firebase.database().ref('messages/' + ref.key + "/").on('child_changed', function(snapshot) {
+                        let obj = snapshot.val();
+                        let key = snapshot.key;
+                        //                        console.log(key);
 
-                          h4Up.innerHTML = `<i class="arrow up"></i> ${obj}`
-
-
-
-
-                    })
-
-                    firebase.database().ref('messages/'+ ref.key + "/downVote").on('child_changed', function(snapshot) {
-                            let obj = snapshot.val();
-                            console.log('child_changed', obj);
-
-                          h4Down.innerHTML = `<i class="arrow down"></i> ${obj}`
-
-
-
+                        if (key === "upVote") {
+                            h4Up.innerHTML = `<i class="arrow up"></i> ${upVoteNr = upVoteNr + 1}`
+                            console.log("upvote")
+                        } else {
+                            h4Down.innerHTML = `<i class="arrow down"></i> ${downVoteNr = downVoteNr +1}`
+                            console.log("downvote")
+                        }
 
                     })
-
 
                 }
                 messageInput.value = "";
 
             }
 
-                        db.ref("/messages").on("value", function(snapshot) {
-                            let chatting = snapshot.val();
-                            console.log(chatting)
-                        })
+            db.ref("/messages").on("value", function(snapshot) {
+                let chatting = snapshot.val();
+                console.log(chatting)
+            })
 
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
@@ -358,33 +354,33 @@
             db.ref("/messages").on("child_added", function(snapshot) {
                 let chatting = snapshot.val();
                 let li = document.createElement("li");
-                li.className = "message"+ y
+                li.className = "message" + y
                 let img = document.createElement("img");
-                img.src=chatting.photo;
+                img.src = chatting.photo;
                 img.style.borderRadius = "25px"
                 li.innerHTML = `<img src="${chatting.photo}"/><strong>${chatting.who}</strong>&nbsp<em>${chatting.time}</em><br>
             ${chatting.text} `
 
 
-                 h4Up = document.createElement("h4");
-                 h4Down = document.createElement("h4");
+                h4Up = document.createElement("h4");
+                h4Down = document.createElement("h4");
 
 
                 ul.appendChild(li);
                 li.appendChild(h4Up);
                 li.appendChild(h4Down)
-                  console.log(li)
+                console.log(li)
                 y++
             })
 
 
-//             db.ref('/text').on('value', function(snapshot) {
-// 	// Inträffar när ett objekt ändras.
-//             	let data = snapshot.val();
-//             	let key  = snapshot.key;
-//             console.log(data)
-//               // `<i class="arrow up"></i></li> ${chatting.like.upVote} <i class="arrow down"></i> ${chatting.like.downVote}`
-// });
+            //             db.ref('/text').on('value', function(snapshot) {
+            // 	// Inträffar när ett objekt ändras.
+            //             	let data = snapshot.val();
+            //             	let key  = snapshot.key;
+            //             console.log(data)
+            //               // `<i class="arrow up"></i></li> ${chatting.like.upVote} <i class="arrow down"></i> ${chatting.like.downVote}`
+            // });
 
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
@@ -484,15 +480,17 @@
             display: inline-block;
             padding: 3px;
         }
-        .up {
-          transform: rotate(-135deg);
-          -webkit-transform: rotate(-135deg);
-      }
 
-      .down {
-          transform: rotate(45deg);
-          -webkit-transform: rotate(45deg);
-      }
+        .up {
+            transform: rotate(-135deg);
+            -webkit-transform: rotate(-135deg);
+        }
+
+        .down {
+            transform: rotate(45deg);
+            -webkit-transform: rotate(45deg);
+        }
+
         #c {
             position: absolute;
             top: 0;
@@ -512,7 +510,7 @@
             text-align: center;
             background-color: black;
             opacity: 0.8;
-            border-bottom: 2px solid rgba(255,255,255,0.5)
+            border-bottom: 2px solid rgba(255, 255, 255, 0.5)
         }
 
         #inlogg>button {
@@ -564,7 +562,7 @@
         }
 
         #ul>li {
-/*            width: inherit;*/
+            /*            width: inherit;*/
             background-color: whitesmoke;
             border-radius: 3px 3px 2px 2px;
             width: 845px;
@@ -581,6 +579,7 @@
             height: 45px;
             width: 45px;
         }
+
         ul img {
             float: left;
         }
@@ -597,18 +596,18 @@
         }
 
         #login #enter {
-            color:black;
+            color: black;
 
         }
 
-        #login input{
-          width:50%;
+        #login input {
+            width: 50%;
         }
 
         #enter {
 
-          padding:0;
-          width: 100px;
+            padding: 0;
+            width: 100px;
 
         }
 
@@ -623,7 +622,7 @@
             border-radius: 5px 5px;
         }
 
-       .tva > #sendMessage {
+        .tva>#sendMessage {
             left: 560px;
             position: absolute;
             border-radius: 5px;
@@ -633,11 +632,11 @@
             padding: 5px 15px 5px 15px;
             text-decoration: none;
             top: 2px;
-           width: 5em;
-           margin-top: 0px;
+            width: 5em;
+            margin-top: 0px;
         }
 
-       .tva > #sendMessage:hover {
+        .tva>#sendMessage:hover {
             text-decoration: none;
             background: #3cb0fd;
         }
@@ -661,7 +660,8 @@
             height: 3em;
 
         }
-.buttonSend {
+
+        .buttonSend {
             font-size: 12px;
             border-radius: 10px;
             background: #3498db;
@@ -673,8 +673,9 @@
             width: 11em;
             height: 3em;
             position: relative;
-/*    top: 0px;*/
+            /*    top: 0px;*/
         }
+
         .buttonSend:hover {
             background: #3cb0fd;
 
@@ -688,7 +689,7 @@
 
 
         .red {
-            background-color: rgba(255,255,255,0.2);
+            background-color: rgba(255, 255, 255, 0.2);
             width: 7em;
             height: 3em;
         }
