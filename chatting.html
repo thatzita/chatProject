@@ -430,6 +430,7 @@
             text-align: center;
             background-color: black;
             opacity: 0.8;
+            border-bottom: 2px solid rgba(255,255,255,0.5)
         }
 
         #inlogg>button {
@@ -511,6 +512,22 @@
             margin-top: 100px;
         }
 
+        #login #enter {
+            color:black;
+          
+        }
+
+        #login input{
+          width:50%;
+        }
+
+        #enter {
+
+          padding:0;
+          width: 100px;
+
+        }
+
         #enterGithub {
             margin-top: 2em;
         }
@@ -549,7 +566,6 @@
         .button {
             font-size: 12px;
             border-radius: 10px;
-            background: #3498db;
             color: #ffffff;
             /*            font-size: 20px;*/
             padding: 10px 15px 10px 15px;
@@ -565,13 +581,12 @@
 
         .button:hover {
             text-decoration: none;
-            background: #3cb0fd;
             margin-top: 5px;
 
         }
 
         .red {
-            background-color: #990000;
+            background-color: rgba(255,255,255,0.2);
             width: 7em;
             height: 3em;
         }
@@ -605,13 +620,13 @@
         <input type="text" placeholder="Username" id="username">
         <button id="enter" class="button">Enter Chat</button><br>
 
-        <button id="enterGithub" class="button">Login with Github</button>
+        <img src="github.png" id="enterGithub" class="button">
         <br>
 
 
-        <button id="enterGmail" class="button">Login with Gmail</button>
+        <img src="https://www.htps.us/UserFiles/Servers/Server_791028/Templates/login-google.png" id="enterGmail" class="button">
         <br>
-        <button id="enterFB" class="button">Login with Facebook</button>
+        <img src="https://comedydefensivedriving.com/images2011/fb-sign-in-button.png" id="enterFB" class="button">
     </div>
 
     <div class="chatRuta">
