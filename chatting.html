@@ -309,6 +309,11 @@
                             let obj = snapshot.val();
                             console.log('child_changed', obj);
 
+                          h4.innerHTML = `<i class="arrow up"></i> ${obj} <i class="arrow down"></i> ${obj}`
+
+
+
+
                     })
 
                 }
@@ -339,10 +344,12 @@
 
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
-
+            let h4;
+            let y = 0;
             db.ref("/messages").on("child_added", function(snapshot) {
                 let chatting = snapshot.val();
                 let li = document.createElement("li");
+                li.className = "message"+ y
                 let img = document.createElement("img");
                 img.src=chatting.photo;
                 img.style.borderRadius = "25px"
@@ -350,9 +357,13 @@
             ${chatting.text} `
 
 
+                 h4 = document.createElement("h4");
 
 
                 ul.appendChild(li);
+                li.appendChild(h4)
+                  console.log(li)
+                y++
             })
 
 
