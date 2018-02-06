@@ -259,9 +259,8 @@
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
 
-          let ref;
-
             function clickAway() {
+                let newPostKey = firebase.database().ref().child('posts').push().key;
                 let theTime = new Date();
                 let year = theTime.getFullYear();
                 let month = theTime.getMonth();
@@ -270,7 +269,7 @@
                 if (month < 10) {
                     month = "0" + month;
                 }
-                if (date < 10 ) {
+                if (date < 10) {
                     date = "0" + date;
                 }
                 let hours = theTime.getHours();
@@ -291,8 +290,11 @@
                         time: year + "-" + month + "-" + date + " " + hours + ":" + minutes,
                         photo: userLogin.photoURL,
                         upVote: 0,
-                        downVote: 0
+                        downVote: 0,
+                        id: newPostKey,
+
                     }
+
                 } else {
                     message = {
                         who: username.value,
@@ -300,7 +302,8 @@
                         time: year + "-" + month + "-" + date + " " + hours + ":" + minutes,
                         photo: "trollface.png",
                         upVote: 0,
-                        downVote: 0
+                        downVote: 0,
+                        id: newPostKey,
                     }
                 }
 
