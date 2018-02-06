@@ -259,7 +259,7 @@
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
 
-
+          let ref;
 
             function clickAway() {
                 let theTime = new Date();
@@ -305,9 +305,11 @@
                 }
 
                 if (messageInput.value !== "") {
-                    let ref = db.ref("/messages").push(message);
-                    console.log(typeof ref.key)
+                     ref = db.ref("/messages").push(message);
+                    console.log( ref.key)
+                    console.log(2)
 
+                    h4Up.innerHTML = `<i class="arrow up pilUpp" id="${ref.key}"></i>0`
                     firebase.database().ref('messages/' + ref.key + "/").on('child_changed', function(snapshot) {
                         let obj = snapshot.val();
                         let key = snapshot.key;
@@ -322,6 +324,7 @@
                         }
 
                     })
+
 
                 }
                 messageInput.value = "";
@@ -355,11 +358,11 @@
 
 
 
-
             let h4Up;
             let h4Down
             let y = 0;
             db.ref("/messages").on("child_added", function(snapshot) {
+                console.log(1)
                 let chatting = snapshot.val();
                 let li = document.createElement("li");
                 li.className = "message" + y
@@ -372,8 +375,8 @@
 
                 h4Up = document.createElement("h4");
 
-                h4Up.innerHTML = `<i class="arrow up pilUpp"></i>0`
 
+                h4Up.innerHTML = `<i class="arrow up pilUpp"></i>0`
 
 
 
@@ -388,18 +391,24 @@ h4Down.innerHTML = `<i class="arrow down"></i>0`
                 console.log(li)
                 y++
 
+                console.log(h4Up)
+
+
 
 
             })
 
+
             window.addEventListener("click",function(e){
 
 
+              console.log(e.target.className)
+
+              if(e.target.className === "arrow up pilUpp"){
 
 
-
-
-                  console.log(e.target)
+                    console.log(e.target)
+                }
 
 
 
