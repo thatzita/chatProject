@@ -376,7 +376,6 @@
                 console.log(1)
                 let chatting = snapshot.val();
                 let li = document.createElement("li");
-                li.className = "message" + y
                 let img = document.createElement("img");
                 img.src = chatting.photo;
                 img.style.borderRadius = "25px"
@@ -394,7 +393,7 @@
 
 
 
-                h4Up.className = chatting.id
+                li.className = chatting.id
                 h4Down = document.createElement("h4");
 
 h4Down.innerHTML = `<i class="arrow down"></i>0`
@@ -404,7 +403,7 @@ h4Down.innerHTML = `<i class="arrow down"></i>0`
                 li.appendChild(h4Down)
                 y++
 
-                console.log("h4Up:", h4Up)
+                console.log("li:", li)
 
 
 
