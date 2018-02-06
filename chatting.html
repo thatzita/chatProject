@@ -263,7 +263,6 @@
             let nu = k.toFixed(5)
 
             function clickAway() {
-                let newPostKey = firebase.database().ref().child('posts').push().key;
                 let theTime = new Date();
                 let year = theTime.getFullYear();
                 let month = theTime.getMonth();
@@ -319,12 +318,9 @@
                     console.log( ref.key)
                     console.log(2)
 
-                    console.log(newPostKey)
-                    newPostKey.on('value', function(snapshot) {
-  updateStarCount(postElement, snapshot.val());
-});
 
-                    h4Up.innerHTML = `<i class="arrow up pilUpp" id="${newPostKey}"></i>0`
+
+                    h4Up.innerHTML = `<i class="arrow up pilUpp"></i>0`
                     firebase.database().ref('messages/' + ref.key + "/").on('child_changed', function(snapshot) {
                         let obj = snapshot.val();
                         let key = snapshot.key;
@@ -388,10 +384,15 @@
             ${chatting.text} `
 
 
+                console.log("chatting id: " + chatting.id)
+
+                let newPostKey = firebase.database().ref().child('posts').push().key;
+
+                console.log("newPostKEY: "+ newPostKey)
                 h4Up = document.createElement("h4");
 
 
-                h4Up.innerHTML = `<i class="arrow up pilUpp"></i>0`
+                h4Up.innerHTML = `<i class="arrow up pilUpp" id="${newPostKey}"></i>0`
 
 
 
@@ -403,10 +404,9 @@ h4Down.innerHTML = `<i class="arrow down"></i>0`
                 ul.appendChild(li);
                 li.appendChild(h4Up);
                 li.appendChild(h4Down)
-                console.log(li)
                 y++
 
-                console.log(h4Up)
+                console.log("h4Up:", h4Up)
 
 
 
