@@ -321,6 +321,9 @@
 
 
                     h4Up.innerHTML = `<i class="arrow up pilUpp"></i>0`
+
+
+
                     firebase.database().ref('messages/' + ref.key + "/").on('child_changed', function(snapshot) {
                         let obj = snapshot.val();
                         let key = snapshot.key;
@@ -338,6 +341,7 @@
 
 
                 }
+
                 messageInput.value = "";
 
             }
@@ -419,7 +423,18 @@ h4Down.innerHTML = `<i class="arrow down"></i>0`
               if(e.target.className === "arrow up pilUpp"){
 
 
-                    console.log(e.target)
+                    let li = e.target.parentNode.parentNode;
+                    let liClass = li.className;
+                    db.ref('messages/').on('value', function(snapshot) {
+                        	let allData = snapshot.val();
+                      	for( let object in allData ) {
+
+                              if(liClass === allData[object].id){
+                                console.log(allData[object].id)
+
+                              }
+                         }
+                      });
                 }
 
 
