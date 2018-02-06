@@ -260,7 +260,7 @@
             ////////////////////////////////////////////////////////////
 
             let k = Math.random() * 10;
-            let nu = k.toFixed(5)
+            let nu = "h4up" + k.toFixed(5)
 
             function clickAway() {
                 let theTime = new Date();
@@ -297,7 +297,7 @@
 
                     }
 
-                    nu++
+                    nu = nu + 1
 
                 } else {
                     message = {
@@ -310,7 +310,7 @@
                         id: nu,
                     }
 
-                    nu++
+                    nu = nu + 1
                 }
 
                 if (messageInput.value !== "") {
@@ -386,17 +386,15 @@
 
                 console.log("chatting id: " + chatting.id)
 
-                let newPostKey = firebase.database().ref().child('posts').push().key;
 
-                console.log("newPostKEY: "+ newPostKey)
                 h4Up = document.createElement("h4");
 
 
-                h4Up.innerHTML = `<i class="arrow up pilUpp" id="${newPostKey}"></i>0`
+                h4Up.innerHTML = `<i class="arrow up pilUpp" id="${chatting.id}"></i>0`
 
 
 
-                h4Up.className = "h4Up"
+                h4Up.className = chatting.id
                 h4Down = document.createElement("h4");
 
 h4Down.innerHTML = `<i class="arrow down"></i>0`
