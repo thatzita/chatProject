@@ -261,6 +261,7 @@
 
             let k = Math.random() * 10;
             let nu = "h4up" + k.toFixed(5)
+            let message = {};
 
             function clickAway() {
                 let theTime = new Date();
@@ -282,7 +283,6 @@
                 if (minutes < 10) {
                     minutes = "0" + minutes;
                 }
-                let message = {};
 
                 let userLogin = firebase.auth().currentUser;
                 if (userLogin !== null) {
@@ -348,7 +348,7 @@
 
             db.ref("/messages").on("value", function(snapshot) {
                 let chatting = snapshot.val();
-                console.log(chatting)
+                //console.log(chatting)
             })
 
             ////////////////////////////////////////////////////////////
@@ -400,7 +400,9 @@
                 li.className = chatting.id
                 h4Down = document.createElement("h4");
 
-h4Down.innerHTML = `<i class="arrow down"></i>0`
+                h4Down.innerHTML = `<i class="arrow down pilDown" id="${chatting.id}"></i>0`
+
+
 
                 ul.appendChild(li);
                 li.appendChild(h4Up);
@@ -418,24 +420,54 @@ h4Down.innerHTML = `<i class="arrow down"></i>0`
             window.addEventListener("click",function(e){
 
 
-              console.log(e.target.className)
+              //console.log(e.target.className)
 
-              if(e.target.className === "arrow up pilUpp"){
+              //console.log(message)
+              if(e.target.className === "arrow up pilUpp" || e.target.className === "arrow down pilDown"){
 
 
                     let li = e.target.parentNode.parentNode;
                     let liClass = li.className;
-                    db.ref('messages/').on('value', function(snapshot) {
+                    console.log(event.target.id);
+                    console.log(liClass);
+                    //console.log(li)
+                    //h4up0.2417211111   h4up5.13230  h4up8.40888
+
+                    let path = ""
+                    let antal = 0;
+                    let antalDown = 0;
+                    db.ref('messages/').once('value', function(snapshot) {
                         	let allData = snapshot.val();
                       	for( let object in allData ) {
 
                               if(liClass === allData[object].id){
-                                console.log(object)
 
-                                console.log(allData[object].id)
+                                antal = allData[object].upVote
+                                antalDown = allData[object].downVote
+                                path = object;
+                                //console.log(object)
+
+                                //console.log(allData[object].id)
+
+
                               }
-                         }
-                      });
+                        }
+                    });
+
+
+                    // här spara till db....
+                    let tomte = {
+                      name: "tomte",
+                      like: 1
+                    }
+
+                if(e.target.className === "arrow up pilUpp")
+                  db.ref("messages/"+path+"/upVote/").set(++antal)
+                else {
+                  db.ref("messages/"+path+"/downVote/").set(--antalDown)
+
+                }
+
                 }
 
 
