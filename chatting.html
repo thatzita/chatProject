@@ -315,25 +315,46 @@
 
                 if (messageInput.value !== "") {
                      ref = db.ref("/messages").push(message);
-                    console.log( ref.key)
-                    console.log(2)
+                    // console.log( ref.key)
+                    // console.log(2)
 
 
 
-                    h4Up.innerHTML = `<i class="arrow up pilUpp"></i>0`
 
 
 
                     firebase.database().ref('messages/' + ref.key + "/").on('child_changed', function(snapshot) {
                         let obj = snapshot.val();
                         let key = snapshot.key;
-                        //                        console.log(key);
+                        // let classen;
+                        //
+                        // db.ref('messages/' + ref.key + "/").on("value",function(snapshot){
+                        // classen = snapshot.val().id
+                        //
+                        // })
 
+                                               // console.log("objectet är " +obj);
+                                               console.log("key = " + key)
+                                               // console.log("key id " +key.id)
+                                               // console.log("klassen i changed är : " )
+                                              console.log("klassen lokalt är: " + liClass)
+
+                                                // console.log("H4UP classname  " +h4Up.parentNode.className)
+
+                                                let test = h4Up.parentNode.className
+
+                                                let liet = document.getElementsByClassName(liClass)[0]
+                                                console.log("child_changed")
                         if (key === "upVote") {
-                            h4Up.innerHTML = `<i class="arrow up"></i> ${upVoteNr = upVoteNr + 1}`
+                          // console.log("hej")
+
+                            console.log(liet.children)
+
+                            liet.children[4].innerHTML = `<i class="arrow up pilUpp"></i> ${antal}`
                             console.log("upvote")
+
                         } else {
-                            h4Down.innerHTML = `<i class="arrow down"></i> ${downVoteNr = downVoteNr +1}`
+                            liet.children[5].innerHTML = `<i class="arrow down pilDown"></i> ${antalDown}`
                             console.log("downvote")
                         }
 
@@ -346,10 +367,10 @@
 
             }
 
-            db.ref("/messages").on("value", function(snapshot) {
-                let chatting = snapshot.val();
-                //console.log(chatting)
-            })
+            // db.ref("/messages").on("value", function(snapshot) {
+            //     let chatting = snapshot.val();
+            //     //console.log(chatting)
+            // })
 
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
@@ -372,14 +393,14 @@
 
 
 
-
+            let li;
             let h4Up;
             let h4Down
             let y = 0;
             db.ref("/messages").on("child_added", function(snapshot) {
-                console.log(1)
+                // console.log(1)
                 let chatting = snapshot.val();
-                let li = document.createElement("li");
+                 li = document.createElement("li");
                 let img = document.createElement("img");
                 img.src = chatting.photo;
                 img.style.borderRadius = "25px"
@@ -387,20 +408,22 @@
             ${chatting.text} `
 
 
-                console.log("chatting id: " + chatting.id)
+                // console.log("chatting id: " + chatting.id)
 
 
                 h4Up = document.createElement("h4");
 
 
-                h4Up.innerHTML = `<i class="arrow up pilUpp" id="${chatting.id}"></i>0`
-
+                h4Up.innerHTML = `<i class="arrow up pilUpp" ></i>0`
 
 
                 li.className = chatting.id
+
+                // console.log(li)
+
                 h4Down = document.createElement("h4");
 
-                h4Down.innerHTML = `<i class="arrow down pilDown" id="${chatting.id}"></i>0`
+                h4Down.innerHTML = `<i class="arrow down pilDown" ></i>0`
 
 
 
@@ -409,33 +432,30 @@
                 li.appendChild(h4Down)
                 y++
 
-                console.log("li:", li)
+                // console.log("li:", li)
 
 
 
 
             })
 
+            let liClass;
+            let antal = 0;
+            let antalDown =0;
 
             window.addEventListener("click",function(e){
-
-
+            // console.log(e.target.className)
               //console.log(e.target.className)
-
               //console.log(message)
               if(e.target.className === "arrow up pilUpp" || e.target.className === "arrow down pilDown"){
-
-
                     let li = e.target.parentNode.parentNode;
-                    let liClass = li.className;
-                    console.log(event.target.id);
-                    console.log(liClass);
-                    //console.log(li)
-                    //h4up0.2417211111   h4up5.13230  h4up8.40888
 
+                     liClass = li.className;
+                    console.log(event.target.id);
+                    console.log("klassen är  : " + liClass);
+                    // console.log("li är " + li)
+                    //h4up0.2417211111   h4up5.13230  h4up8.40888
                     let path = ""
-                    let antal = 0;
-                    let antalDown = 0;
                     db.ref('messages/').once('value', function(snapshot) {
                         	let allData = snapshot.val();
                       	for( let object in allData ) {
@@ -461,30 +481,18 @@
                       like: 1
                     }
 
-                if(e.target.className === "arrow up pilUpp")
+                if(e.target.className === "arrow up pilUpp"){
+                console.log("funkar antal++")
+
+                console.log("Skickar upp till database")
                   db.ref("messages/"+path+"/upVote/").set(++antal)
-                else {
+                }else {
                   db.ref("messages/"+path+"/downVote/").set(--antalDown)
-
+console.log("funkar antal--")
                 }
-
-                }
-
-
-
+              }
             })
 
-
-
-
-
-            //             db.ref('/text').on('value', function(snapshot) {
-            // 	// Inträffar när ett objekt ändras.
-            //             	let data = snapshot.val();
-            //             	let key  = snapshot.key;
-            //             console.log(data)
-            //               // `<i class="arrow up"></i></li> ${chatting.like.upVote} <i class="arrow down"></i> ${chatting.like.downVote}`
-            // });
 
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
