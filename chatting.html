@@ -183,12 +183,12 @@ userKey =  db.ref("/users/").push(user.displayName);
             ////////////////////////////////////////////////////////////
             function githubLogout() {
                 firebase.auth().signOut().then(function(result) {
-                    // console.log("Success! you are now logged out");
+                     console.log("Success! you are now logged out");
                     displayLogOut()
 
 
                 }).catch(function(error) {
-                    // console.log("Error, something happened");
+                     console.log("Error, something happened");
                 });
 
             }
@@ -199,13 +199,13 @@ userKey =  db.ref("/users/").push(user.displayName);
 
 
             logOut.addEventListener("click", function() {
-//                let currentUser = firebase.auth().currentUser;
+                currentUser = firebase.auth().currentUser;
                 if (currentUser === null) {
 
                     myStorage.removeItem("name");
                     displayLogOut();
                 } else if (currentUser.providerData[0].providerId === "github.com") {
-                    // console.log("GithubLogout");
+                     console.log("GithubLogout");
                     githubLogout();
                     currentUser.delete().then(function() {
                         // console.log("User deleted");
@@ -215,7 +215,7 @@ userKey =  db.ref("/users/").push(user.displayName);
 
                     displayLogOut()
                 } else if (currentUser.providerData[0].providerId === "google.com") {
-                    // console.log("GmailLogout");
+                     console.log("GmailLogout");
                     gmailLogout();
                     currentUser.delete().then(function() {
                         // console.log("User deleted");
@@ -224,7 +224,7 @@ userKey =  db.ref("/users/").push(user.displayName);
                     });
                     displayLogOut()
                 } else if (currentUser.providerData[0].providerId === "facebook.com") {
-                    // console.log("facebookLogout");
+                     console.log("facebookLogout");
                     facebookLogout();
                     currentUser.delete().then(function() {
                         // console.log("User deleted");
@@ -541,7 +541,16 @@ userKey =  db.ref("/users/").push(user.displayName);
                     let token = result.credential.accessToken;
                     // The signed-in user info.
                     let user = result.user;
-// console.log(firebase.auth().currentUser)
+                    console.log(firebase.auth().currentUser)
+if (user != null) {
+  user.providerData.forEach(function (profile) {
+    console.log("Sign-in provider: " + profile.providerId);
+    console.log("  Provider-specific UID: " + profile.uid);
+    console.log("  Name: " + profile.displayName);
+    console.log("  Email: " + profile.email);
+    console.log("  Photo URL: " + profile.photoURL);
+  });
+}
 
                    userKey =  db.ref("/users/").push(user.displayName);
                     displayLogIn()
