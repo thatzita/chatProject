@@ -19,7 +19,7 @@
                 messagingSenderId: "1072451775566"
             };
             firebase.initializeApp(config);
-
+                let currentUser = firebase.auth().currentUser;
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
 
@@ -57,6 +57,9 @@
             let downVoteNr = 0;
             ///////////////////////
 
+            let liClass;
+
+
             function displayLogIn() {
                 inlogg.style.display = "block";
                 login.style.display = "none";
@@ -71,18 +74,17 @@
                 inlogg.style.display = "block"
                 login.style.display = "block";
                 chatRuta.style.display = "none"
-
             }
 
             firebase.auth().onAuthStateChanged(function(user) {
                 if (user) {
-                    console.log("Inloggad")
+                    // console.log("Inloggad")
                 } else {
-                    console.log("utloggad")
+                    // console.log("utloggad")
                 }
             });
 
-
+let userKey;
             loginFB.addEventListener("click", function() {
                 firebase.auth().signInWithPopup(fbProvider).then(function(result) {
                     // This gives you a Facebook Access Token. You can use it to access the Facebook API.
@@ -90,9 +92,9 @@
                     // The signed-in user info.
                     var user = result.user;
                     // ...
-
+userKey =  db.ref("/users/").push(user.displayName);
                     displayLogIn()
-                    console.log(firebase.auth().currentUser)
+                     console.log(firebase.auth().currentUser)
                 }).catch(function(error) {
                     // Handle Errors here.
                     var errorCode = error.code;
@@ -103,10 +105,10 @@
                     var credential = error.credential;
                     // ...
 
-                    console.log(errorCode)
-                    console.log(errorMessage)
-                    console.log(email)
-                    console.log(credential)
+                    // console.log(errorCode)
+                    // console.log(errorMessage)
+                    // console.log(email)
+                    // console.log(credential)
                 });
             })
 
@@ -117,7 +119,7 @@
                     // The signed-in user info.
                     var user = result.user;
 
-                    ////
+                       userKey =  db.ref("/users/").push(user.displayName);
                     displayLogIn()
 
                     // ...
@@ -129,7 +131,7 @@
                     var email = error.email;
                     // The firebase.auth.AuthCredential type that was used.
                     var credential = error.credential;
-                    console.log(errorMessage)
+                    // console.log(errorMessage)
                     // ...
                 });
             })
@@ -137,12 +139,12 @@
             function gmailLogout() {
 
                 firebase.auth().signOut().then(function() {
-                    console.log("logged out successfully")
+                    // console.log("logged out successfully")
 
                     displayLogOut()
 
                 }, function(error) {
-                    console.log("signOut Failed")
+                    // console.log("signOut Failed")
                 })
 
 
@@ -152,15 +154,16 @@
             function facebookLogout() {
 
                 firebase.auth().signOut().then(function() {
-                    console.log("logged out successfully")
+                    // console.log("logged out successfully")
 
                     displayLogOut()
 
 
                 }, function(error) {
-                    console.log("signOut Failed")
+                    // console.log("signOut Failed")
                 })
             }
+
 
             let chatRutaBool = false; // Kollar om vi har klickat enter. Så den inte gör om det.
             function userCheck(userValue) {
@@ -171,7 +174,7 @@
 
                     newUser.name = userValue;
                     myStorage.setItem('name', userValue);
-                    db.ref("/users/" + userValue).set(userValue);
+                    userKey = db.ref("/users/").push(userValue);
 
                 }
             }
@@ -180,12 +183,12 @@
             ////////////////////////////////////////////////////////////
             function githubLogout() {
                 firebase.auth().signOut().then(function(result) {
-                    console.log("Success! you are now logged out");
+                    // console.log("Success! you are now logged out");
                     displayLogOut()
 
 
                 }).catch(function(error) {
-                    console.log("Error, something happened");
+                    // console.log("Error, something happened");
                 });
 
             }
@@ -196,37 +199,37 @@
 
 
             logOut.addEventListener("click", function() {
-                let currentUser = firebase.auth().currentUser;
+//                let currentUser = firebase.auth().currentUser;
                 if (currentUser === null) {
 
                     myStorage.removeItem("name");
                     displayLogOut();
                 } else if (currentUser.providerData[0].providerId === "github.com") {
-                    console.log("GithubLogout");
+                    // console.log("GithubLogout");
                     githubLogout();
                     currentUser.delete().then(function() {
-                        console.log("User deleted");
+                        // console.log("User deleted");
                     }).catch(function(error) {
-                        console.log("An error happened");
+                        // console.log("An error happened");
                     });
 
                     displayLogOut()
                 } else if (currentUser.providerData[0].providerId === "google.com") {
-                    console.log("GmailLogout");
+                    // console.log("GmailLogout");
                     gmailLogout();
                     currentUser.delete().then(function() {
-                        console.log("User deleted");
+                        // console.log("User deleted");
                     }).catch(function(error) {
-                        console.log("An error happened");
+                        // console.log("An error happened");
                     });
                     displayLogOut()
                 } else if (currentUser.providerData[0].providerId === "facebook.com") {
-                    console.log("facebookLogout");
+                    // console.log("facebookLogout");
                     facebookLogout();
                     currentUser.delete().then(function() {
-                        console.log("User deleted");
+                        // console.log("User deleted");
                     }).catch(function(error) {
-                        console.log("An error happened");
+                        // console.log("An error happened");
                     });
 
                 }
@@ -291,9 +294,13 @@
                         text: messageInput.value,
                         time: year + "-" + month + "-" + date + " " + hours + ":" + minutes,
                         photo: userLogin.photoURL,
-                        upVote: 0,
-                        downVote: 0,
+                        userId: userKey.key,
                         id: nu,
+                        //  voteInfo: {
+                        // upVote: 0,
+                        // downVote: 0,
+                        //      nameLike: username.value,
+                        //  }
 
                     }
 
@@ -305,61 +312,23 @@
                         text: messageInput.value,
                         time: year + "-" + month + "-" + date + " " + hours + ":" + minutes,
                         photo: "trollface.png",
-                        upVote: 0,
-                        downVote: 0,
+                        userId: userKey.key,
                         id: nu,
+                        // voteInfo: {
+                        // upVote: 0,
+                        // downVote: 0,
+                        //      nameLike: username.value,
+                        //  }
                     }
 
                     nu = nu + 1
                 }
 
                 if (messageInput.value !== "") {
-                     ref = db.ref("/messages").push(message);
-                    // console.log( ref.key)
+                    ref = db.ref("/messages").push(message);
+                    console.log(ref.key)
+
                     // console.log(2)
-
-
-
-
-
-
-                    firebase.database().ref('messages/' + ref.key + "/").on('child_changed', function(snapshot) {
-                        let obj = snapshot.val();
-                        let key = snapshot.key;
-                        // let classen;
-                        //
-                        // db.ref('messages/' + ref.key + "/").on("value",function(snapshot){
-                        // classen = snapshot.val().id
-                        //
-                        // })
-
-                                               // console.log("objectet är " +obj);
-                                               console.log("key = " + key)
-                                               // console.log("key id " +key.id)
-                                               // console.log("klassen i changed är : " )
-                                              console.log("klassen lokalt är: " + liClass)
-
-                                                // console.log("H4UP classname  " +h4Up.parentNode.className)
-
-                                                let test = h4Up.parentNode.className
-
-                                                let liet = document.getElementsByClassName(liClass)[0]
-                                                console.log("child_changed")
-                        if (key === "upVote") {
-                          // console.log("hej")
-
-                            console.log(liet.children)
-
-                            liet.children[4].innerHTML = `<i class="arrow up pilUpp"></i> ${antal}`
-                            console.log("upvote")
-
-                        } else {
-                            liet.children[5].innerHTML = `<i class="arrow down pilDown"></i> ${antalDown}`
-                            console.log("downvote")
-                        }
-
-                    })
-
 
                 }
 
@@ -367,6 +336,71 @@
 
             }
 
+
+            firebase.database().ref('messages/').on('child_changed', function(snapshot) {
+               let obj = snapshot.val();
+                let key = snapshot.key;
+                let voteUp ;
+
+
+               // db.ref("messages/"+path).on("value",function(snapshot){
+
+                  console.log( snapshot.val().totalUp)
+
+                  voteUp = snapshot.val().totalUp
+
+
+               // })
+
+                 let liEl = document.getElementsByClassName(obj.id)[0];
+
+                 let liChildren = liEl.children
+                 let liChildrenLength = liChildren.length
+                 let h4Up = liChildren[liChildrenLength-2]
+                 let span = h4Up.children[h4Up.children.length-1];
+
+                  if(voteUp === undefined){
+                    span.innerHTML = 1
+
+                  }else{
+                 span.innerHTML = voteUp
+               }
+//
+
+
+                // let classen;
+                //
+                // db.ref('messages/' + ref.key + "/").on("value",function(snapshot){
+                // classen = snapshot.val().id
+                //
+                // })
+                //
+                //                        // console.log("objectet är " +obj);
+                //                        // console.log("key = " + key)
+                //                        // console.log("key id " +key.id)
+                //                        // console.log("klassen i changed är : " )
+                //                       // console.log("klassen lokalt är: " + liClass)
+                //
+                //                         // console.log("H4UP classname  " +h4Up.parentNode.className)
+                //
+                //                         let test = h4Up.parentNode.className
+                //
+                //                         liet = document.getElementsByClassName(liClass)[0]
+                //                         // console.log("child_changed")
+                // if (key === "upVote") {
+                //   // console.log("hej")
+                //
+                //     // console.log(liet.children)
+                //
+                //     liet.children[4].innerHTML = `<i class="arrow up pilUpp"></i> ${antal}`
+                //     // console.log("upvote")
+                //
+                // } else {
+                //     liet.children[5].innerHTML = `<i class="arrow down pilDown"></i> ${antalDown}`
+                //     // console.log("downvote")
+                // }
+
+            })
             // db.ref("/messages").on("value", function(snapshot) {
             //     let chatting = snapshot.val();
             //     //console.log(chatting)
@@ -392,15 +426,13 @@
             ////////////////////////////////////////////////////////////
 
 
-
             let li;
             let h4Up;
             let h4Down
             let y = 0;
-            db.ref("/messages").on("child_added", function(snapshot) {
-                // console.log(1)
+            nyRefKey = db.ref("/messages").on("child_added", function(snapshot) {
                 let chatting = snapshot.val();
-                 li = document.createElement("li");
+                li = document.createElement("li");
                 let img = document.createElement("img");
                 img.src = chatting.photo;
                 img.style.borderRadius = "25px"
@@ -414,7 +446,7 @@
                 h4Up = document.createElement("h4");
 
 
-                h4Up.innerHTML = `<i class="arrow up pilUpp" ></i>0`
+                h4Up.innerHTML = `<i class="arrow up pilUpp" ></i><span>0</span>`
 
 
                 li.className = chatting.id
@@ -423,7 +455,7 @@
 
                 h4Down = document.createElement("h4");
 
-                h4Down.innerHTML = `<i class="arrow down pilDown" ></i>0`
+                h4Down.innerHTML = `<i class="arrow down pilDown" ></i><span>0<span>`
 
 
 
@@ -439,58 +471,63 @@
 
             })
 
-            let liClass;
+            var path = "";
             let antal = 0;
-            let antalDown =0;
-
-            window.addEventListener("click",function(e){
-            // console.log(e.target.className)
-              //console.log(e.target.className)
-              //console.log(message)
-              if(e.target.className === "arrow up pilUpp" || e.target.className === "arrow down pilDown"){
+            let antalDown = 0;
+            window.addEventListener("click", function(e) {
+                if (e.target.className === "arrow up pilUpp" || e.target.className === "arrow down pilDown") {
                     let li = e.target.parentNode.parentNode;
 
-                     liClass = li.className;
-                    console.log(event.target.id);
-                    console.log("klassen är  : " + liClass);
-                    // console.log("li är " + li)
-                    //h4up0.2417211111   h4up5.13230  h4up8.40888
-                    let path = ""
+                    liClass = li.className;
                     db.ref('messages/').once('value', function(snapshot) {
-                        	let allData = snapshot.val();
-                      	for( let object in allData ) {
-
-                              if(liClass === allData[object].id){
-
-                                antal = allData[object].upVote
-                                antalDown = allData[object].downVote
+                        let allData = snapshot.val();
+                        for (let object in allData) {
+                            if (liClass === allData[object].id) {
                                 path = object;
-                                //console.log(object)
-
-                                //console.log(allData[object].id)
-
-
-                              }
+                            }
                         }
                     });
 
-
                     // här spara till db....
-                    let tomte = {
-                      name: "tomte",
-                      like: 1
+                    let newUser = {
+                        userId: userKey.key,
+                        upVote: 0,
+                        downVote: 0,
+                        who: username.value
                     }
 
-                if(e.target.className === "arrow up pilUpp"){
-                console.log("funkar antal++")
+                    let refLike;
+                    if (e.target.className === "arrow up pilUpp") {
+                        let allDataOb = []
+                        let upVoteTotal = 0;
+                        db.ref("messages/" + path + "/likes/").once('value', function(snapshot) {
+                            let allData = snapshot.val();
+                            for (let object in allData) {
+                                allDataOb.push(allData[object].userId)
+                                upVoteTotal = allData[object].upVote
+                            }
+                        });
 
-                console.log("Skickar upp till database")
-                  db.ref("messages/"+path+"/upVote/").set(++antal)
-                }else {
-                  db.ref("messages/"+path+"/downVote/").set(--antalDown)
-console.log("funkar antal--")
+                        let jaEllerNej = false
+                        for (let i = 0; i < allDataOb.length; i++) {
+                            if (allDataOb[i] === newUser.userId) {
+                                console.log("finns redan din jävel")
+                                jaEllerNej = true;
+                            }
+                        }
+
+                        if (jaEllerNej === false) {
+                            let key = db.ref("messages/" + path + "/likes/").push(newUser);
+                            db.ref("messages/" + path + "/likes/" + key.key + "/upVote").set(1)
+                            db.ref("messages/" + path + "/totalUp/").set(++upVoteTotal)
+                            console.log("Skickar upp till database pilUpp")
+                        }
+                        db.ref("messages/" + path + "/id/").set(liClass)
+                    } else {
+                        db.ref("messages/" + path + "/downVote/").set(--antalDown)
+                        // console.log("funkar antal--")
+                    }
                 }
-              }
             })
 
 
@@ -498,11 +535,15 @@ console.log("funkar antal--")
             ////////////////////////////////////////////////////////////
 
             enterGithub.addEventListener("click", function() {
+
                 firebase.auth().signInWithPopup(provider).then(function(result) {
                     // This gives you a GitHub Access Token. You can use it to access the GitHub API.
                     let token = result.credential.accessToken;
                     // The signed-in user info.
                     let user = result.user;
+// console.log(firebase.auth().currentUser)
+
+                   userKey =  db.ref("/users/").push(user.displayName);
                     displayLogIn()
                 }).catch(function(error) {
                     // Handle Errors here.
@@ -512,7 +553,7 @@ console.log("funkar antal--")
                     let email = error.email;
                     // The firebase.auth.AuthCredential type that was used.
                     let credential = error.credential;
-                    console.log(errorMessage);
+                    // console.log(errorMessage);
                 });
             })
 
@@ -567,6 +608,7 @@ console.log("funkar antal--")
 
             setInterval(draw, 80);
         }
+
     </script>
     <style>
         * {
@@ -815,6 +857,7 @@ console.log("funkar antal--")
             height: 30px;
 
         }
+
     </style>
 </head>
 
