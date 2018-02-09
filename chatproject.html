@@ -19,11 +19,8 @@
                 messagingSenderId: "1072451775566"
             };
             firebase.initializeApp(config);
-            let currentUser = firebase.auth().currentUser;
-            ////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////
-
             const db = firebase.database();
+            let currentUser = firebase.auth().currentUser;
             let enter = document.getElementById("enter");
             let enterGithub = document.getElementById("enterGithub");
             let username = document.getElementById("username");
@@ -60,8 +57,6 @@
                 login.style.display = "none";
                 chatRuta.style.display = "block";
                 header.innerText = "Start hacking!";
-
-
             }
 
             function displayLogOut() {
@@ -228,8 +223,6 @@
                     // console.log(errorMessage);
                 });
             })
-
-
 
             function clickAway() {
                 let theTime = new Date();
