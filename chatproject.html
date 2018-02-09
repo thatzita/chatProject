@@ -19,12 +19,13 @@
                 messagingSenderId: "1072451775566"
             };
             firebase.initializeApp(config);
-
+            let currentUser = firebase.auth().currentUser;
             ////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////
 
             const db = firebase.database();
             let enter = document.getElementById("enter");
+            let enterGithub = document.getElementById("enterGithub");
             let username = document.getElementById("username");
             let inlogg = document.getElementById("inlogg");
             let body = document.getElementsByTagName("body")[0];
@@ -33,68 +34,208 @@
             let messageInput = document.getElementById("messageInput");
             let ul = document.getElementById("ul");
             let logOut = document.getElementById("logOut");
-            let message;
+            let logOutButton = document.getElementById("logOutButton");
             let myStorage = window.localStorage;
-            let login = document.getElementById("login");
-            let chatRutaBool = false; // Kollar om vi har klickat enter. Så den inte gör om det.
-            let newUser = {}
-            let path = "";
-            let iLike = 0;
-            let iDislike = 0;
+            let userKey;
+            let message = {};
+            let provider = new firebase.auth.GithubAuthProvider();
+            let gmailprovider = new firebase.auth.GoogleAuthProvider();
+            var fbProvider = new firebase.auth.FacebookAuthProvider();
 
-            //Visa Inlogg
+            let login = document.getElementById("login");
+            let header = document.getElementById("header");
+
+            let loginGmail = document.getElementById("enterGmail");
+            let loginFB = document.getElementById("enterFB");
+            let newUser = {
+                name: ""
+            }
+
+            let liClass;
+            logOut.style.display = "none";
+
             function displayLogIn() {
+                logOut.style.display = "block";
                 inlogg.style.display = "block";
                 login.style.display = "none";
                 chatRuta.style.display = "block";
+                header.innerText = "Start hacking!";
+
+
             }
 
-            //Tar bort chattruta när du loggar ut
             function displayLogOut() {
-                inlogg.style.display = "block"
+                logOut.style.display = "none";
+                inlogg.style.display = "block";
                 login.style.display = "block";
                 chatRuta.style.display = "none"
-                chatRutaBool = false;
+                header.innerText = "Welcome to HackermanChat";
             }
-            //Kolla om namn skrivits in
-            function userCheck(userValue) {
-                displayLogIn();
-                myStorage.setItem('name', userValue);
-                db.ref("/user").push(userValue);
 
-            }
-            //Loggar ut användaren, tar bort från localStorage
-            logOut.addEventListener("click", function() {
-                console.log("removed user")
-                myStorage.removeItem("name");
-                displayLogOut();
+            loginFB.addEventListener("click", function() {
+                firebase.auth().signInWithPopup(fbProvider).then(function(result) {
+                    // This gives you a Facebook Access Token. You can use it to access the Facebook API.
+                    var token = result.credential.accessToken;
+                    // The signed-in user info.
+                    var user = result.user;
+                    userKey = db.ref("/users/").push(user.displayName);
+                    displayLogIn();
+                }).catch(function(error) {
+                    // Handle Errors here.
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+                    // The email of the user's account used.
+                    var email = error.email;
+                    // The firebase.auth.AuthCredential type that was used.
+                    var credential = error.credential;
+                    console.log(errorCode);
+                    console.log(errorMessage);
+                    console.log(email);
+                    console.log(credential);
+                });
             })
 
+            loginGmail.addEventListener("click", function() {
+                firebase.auth().signInWithPopup(gmailprovider).then(function(result) {
+                    // This gives you a Google Access Token. You can use it to access the Google API.
+                    var token = result.credential.accessToken;
+                    // The signed-in user info.
+                    var user = result.user;
+                    userKey = db.ref("/users/").push(user.displayName);
+                    displayLogIn();
+                }).catch(function(error) {
+                    // Handle Errors here.
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+                    // The email of the user's account used.
+                    var email = error.email;
+                    // The firebase.auth.AuthCredential type that was used.
+                    var credential = error.credential;
+                    console.log(errorMessage);
+                });
+            })
+
+            function gmailLogout() {
+                firebase.auth().signOut().then(function() {
+                    console.log("logged out successfully");
+                    displayLogOut();
+                }, function(error) {
+                    console.log("signOut Failed");
+                })
+            }
+
+            function facebookLogout() {
+                firebase.auth().signOut().then(function() {
+                    console.log("logged out successfully")
+                    displayLogOut();
+                }, function(error) {
+                    console.log("signOut Failed")
+                })
+            }
+
+            function userCheck(userValue) {
+                if (username.value === "") {
+                    alert("That is not a hackername, try again");
+                } else {
+                    displayLogIn();
+                    newUser.name = userValue;
+                    myStorage.setItem('name', userValue);
+                    userKey = db.ref("/users/").push(userValue);
+                }
+            }
+
+            function githubLogout() {
+                firebase.auth().signOut().then(function(result) {
+                    console.log("Success! you are now logged out");
+                    displayLogOut();
+                }).catch(function(error) {
+                    console.log("Error, something happened");
+                });
+            }
+
+            logOut.addEventListener("click", function() {
+                currentUser = firebase.auth().currentUser;
+                if (currentUser === null) {
+                    myStorage.removeItem("name");
+                    db.ref('users/' + userKey.key).remove()
+                    console.log("user removed");
+                    displayLogOut();
+                } else if (currentUser.providerData[0].providerId === "github.com") {
+                    console.log("GithubLogout");
+                    db.ref('users/' + userKey.key).remove()
+                    console.log("user removed");
+                    githubLogout();
+                    currentUser.delete().then(function() {
+                        console.log("User deleted");
+                    }).catch(function(error) {
+                        console.log("An error happened");
+                    });
+                    displayLogOut();
+                } else if (currentUser.providerData[0].providerId === "google.com") {
+                    console.log("GmailLogout");
+                    db.ref('users/' + userKey.key).remove()
+                    console.log("user removed");
+                    gmailLogout();
+                    currentUser.delete().then(function() {
+                        console.log("User deleted");
+                    }).catch(function(error) {
+                        console.log("An error happened");
+                    });
+                    displayLogOut();
+                } else if (currentUser.providerData[0].providerId === "facebook.com") {
+                    console.log("facebookLogout");
+                    db.ref('users/' + userKey.key).remove()
+                    console.log("user removed");
+                    facebookLogout();
+                    currentUser.delete().then(function() {
+                        console.log("User deleted");
+                    }).catch(function(error) {
+                        console.log("An error happened");
+                    });
+                }
+            })
 
             enter.addEventListener("click", function(e) {
                 e.preventDefault();
-                if (chatRutaBool === false) {
-                    userCheck(username.value);
-                    chatRutaBool = true;
-                }
+                userCheck(username.value);
             })
 
             username.addEventListener("keydown", function(e) {
-                if (chatRutaBool === false) {
-                    if (e.key === "Enter") {
-                        userCheck(username.value);
-                        chatRutaBool = true;
-                    }
+                if (e.key === "Enter") {
+                    userCheck(username.value);
                 }
             })
 
+            enterGithub.addEventListener("click", function() {
+                firebase.auth().signInWithPopup(provider).then(function(result) {
+                    // This gives you a GitHub Access Token. You can use it to access the GitHub API.
+                    let token = result.credential.accessToken;
+                    // The signed-in user info.
+                    let user = result.user;
+                    if (user != null) {
+                        user.providerData.forEach(function(profile) {});
+                    }
+                    userKey = db.ref("/users/").push(user.displayName);
+                    displayLogIn();
+                }).catch(function(error) {
+                    // Handle Errors here.
+                    let errorCode = error.code;
+                    let errorMessage = error.message;
+                    // The email of the user's account used.
+                    let email = error.email;
+                    // The firebase.auth.AuthCredential type that was used.
+                    let credential = error.credential;
+                    // console.log(errorMessage);
+                });
+            })
+
+
 
             function clickAway() {
-                console.log("click");
-                let time = new Date();
-                let year = time.getFullYear();
-                let month = time.getMonth();
-                let date = time.getDate();
+                let theTime = new Date();
+                let year = theTime.getFullYear();
+                let month = theTime.getMonth();
+                let date = theTime.getDate();
                 month = month + 1;
                 if (month < 10) {
                     month = "0" + month;
@@ -102,86 +243,129 @@
                 if (date < 10) {
                     date = "0" + date;
                 }
-                let hours = time.getHours();
+                let hours = theTime.getHours();
                 if (hours < 10) {
                     hours = "0" + hours;
                 }
-                let minutes = time.getMinutes();
+                let minutes = theTime.getMinutes();
                 if (minutes < 10) {
                     minutes = "0" + minutes;
                 }
-                firebase.database().ref("messages/").push({
-                    who: username.value,
-                    text: messageInput.value,
-                    time: year + "-" + month + "-" + date + " " + hours + ":" + minutes,
-                })
+
+                let userLogin = firebase.auth().currentUser;
+
+                if (userLogin !== null) {
+                    message = {
+                        who: userLogin.displayName,
+                        text: messageInput.value,
+                        time: year + "-" + month + "-" + date + " " + hours + ":" + minutes,
+                        photo: userLogin.photoURL,
+                        userId: userKey.key,
+                    }
+                } else {
+                    message = {
+                        who: username.value,
+                        text: messageInput.value,
+                        time: year + "-" + month + "-" + date + " " + hours + ":" + minutes,
+                        photo: "trollface.png",
+                        userId: userKey.key,
+                    }
+                }
+
+                if (messageInput.value !== "") {
+                    ref = db.ref("/messages").push(message);
+                }
+                messageInput.value = "";
             }
 
-            sendMessage.addEventListener("click", function(event) {
+            sendMessage.addEventListener("click", function() {
                 clickAway();
             })
 
+            messageInput.addEventListener("keydown", function(e) {
+                if (e.key === "Enter") {
+                    clickAway();
+                }
+            })
 
             db.ref("/messages").on("child_added", function(snapshot) {
                 let chatting = snapshot.val();
                 let li = document.createElement("li");
-                let plus = document.createElement("p");
-                let minus = document.createElement("p");
-                let textOutput = `<strong>${chatting.who}</strong>&nbsp<em>${chatting.time}</em><br>
-            ${chatting.text}`
-
-
-                plus.className = "like";
-                plus.innerText = "+";
-
-                minus.className = "dislike";
-                minus.innerText = "-";
-
-                li.innerHTML = textOutput;
-                li.appendChild(plus);
-                li.appendChild(minus);
+                let img = document.createElement("img");
+                img.src = chatting.photo;
+                img.style.borderRadius = "25px"
+                li.innerHTML = `<img src="${chatting.photo}"/><strong>${chatting.who}</strong>&nbsp<em>${chatting.time}</em><br>
+            ${chatting.text} `
                 ul.appendChild(li);
-
             })
 
-            window.addEventListener("click", function(event) {
-                if (event.target.className === "like" || event.target.className === "dislike") {
-                    db.ref("messages/").once("value", function(snapshot) {
-                        let allData = snapshot.val();
-                        for (let object in allData) {
-                            console.log(object);
-                            path = object;
-                        }
-                    })
+            /*CANVAS BACKGRGROUND*/
+            var c = document.getElementById("c");
+            var ctx = c.getContext("2d");
 
-                    if(event.target.className === "like"){
-                        console.log("click! detta var en like")
-                        db.ref("messages/" + path + "/likes/vote").push(newUser);
-                        db.ref("messages/" + path + "/likes/vote/like").set(++iLike);
-                    }else{
-                        console.log("click! detta var en dislike");
-                        db.ref("messages/" + path + "/likes/vote").set(newUser);
-                        db.ref("messages/" + path + "/likes/vote/dislike").set(--iDislike);
-                    }
+            //making the canvas full screen
+            c.height = window.innerHeight;
+            c.width = window.innerWidth;
+
+            //chinese characters - taken from the unicode charset
+            var chinese = "13&&由甲申甴电甶男甸甹町画甼甽甾甿畀畁畂畃畄畅畆畇畈畉畊畋界畍畎畏畐畑";
+            //converting the string into an array of single characters
+            chinese = chinese.split("");
+            var font_size = 10;
+            var columns = c.width / font_size; //number of columns for the rain
+            //an array of drops - one per column
+            var drops = [];
+            //x below is the x coordinate
+            //1 = y co-ordinate of the drop(same for every drop initially)
+            for (var x = 0; x < columns; x++)
+                drops[x] = 1;
+            //drawing the characters
+            function draw() {
+                //Black BG for the canvas
+                //translucent BG to show trail
+                ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+                ctx.fillRect(0, 0, c.width, c.height);
+                ctx.fillStyle = "#0F0"; //green text
+                ctx.font = font_size + "px arial";
+                //looping over drops
+                for (var i = 0; i < drops.length; i++) {
+                    //a random chinese character to print
+                    var text = chinese[Math.floor(Math.random() * chinese.length)];
+                    //x = i*font_size, y = value of drops[i]*font_size
+                    ctx.fillText(text, i * font_size, drops[i] * font_size);
+
+                    //sending the drop back to the top randomly after it has crossed the screen
+                    //adding a randomness to the reset to make the drops scattered on the Y axis
+                    if (drops[i] * font_size > c.height && Math.random() > 0.975)
+                        drops[i] = 0;
+
+                    //incrementing Y coordinate
+                    drops[i]++;
                 }
-            })
+            }
 
-
-
-
+            setInterval(draw, 80);
         }
 
     </script>
+
     <style>
         * {
             margin: 0;
             padding: 0;
         }
 
+        /*basic reset*/
+
+        /*adding a black bg to the body to make things clearer*/
+
         body {
             background: black;
         }
 
+        canvas {
+            display: block;
+        }
 
         i {
             border: solid black;
@@ -200,6 +384,12 @@
             -webkit-transform: rotate(45deg);
         }
 
+        #c {
+            position: absolute;
+            top: 0;
+            z-index: -100;
+            background-size: cover;
+        }
 
         #inlogg>h2 {
             position: relative;
@@ -216,7 +406,7 @@
             border-bottom: 2px solid rgba(255, 255, 255, 0.5)
         }
 
-        #inlogg>button {
+        #logoutButton>button {
             margin-right: 10px;
             position: absolute;
             right: 0;
@@ -227,12 +417,11 @@
             position: absolute;
             left: 20%;
             top: 90px;
-            width: 100%;
+            width: 80%;
             margin: auto;
             display: none;
             transform: rotatex(180deg);
             opacity: 1;
-
         }
 
         #message {
@@ -255,8 +444,6 @@
             list-style: none;
             transform: rotatex(180deg);
             opacity: 1;
-
-
         }
 
         #tva {
@@ -265,7 +452,6 @@
         }
 
         #ul>li {
-            /*            width: inherit;*/
             background-color: whitesmoke;
             border-radius: 3px 3px 2px 2px;
             width: 845px;
@@ -277,6 +463,16 @@
             margin-left: 0.5em;
             opacity: 1;
         }
+
+        img {
+            height: 45px;
+            width: 45px;
+        }
+
+        ul img {
+            float: left;
+        }
+
 
         #login {
             margin: 0 auto;
@@ -321,7 +517,7 @@
             position: absolute;
             border-radius: 5px;
             background: #3498db;
-            color: #ffffff;
+            color: black;
             font-size: 20px;
             padding: 5px 15px 5px 15px;
             text-decoration: none;
@@ -352,14 +548,25 @@
             margin-top: 5px;
             width: 13em;
             height: 3em;
+        }
 
+        #tva .button {
+            font-size: 12px;
+            border-radius: 10px;
+            color: black;
+            padding: 5px;
+            text-decoration: none;
+            font-family: 'Vollkorn', serif;
+            margin-top: 5px;
+            width: 13em;
+            height: 3em;
         }
 
         .buttonSend {
             font-size: 12px;
             border-radius: 10px;
             background: #3498db;
-            color: #ffffff;
+            color: black;
             padding: 10px 15px 10px 15px;
             text-decoration: none;
             font-family: 'Vollkorn', serif;
@@ -367,7 +574,6 @@
             width: 11em;
             height: 3em;
             position: relative;
-            /*    top: 0px;*/
         }
 
         .buttonSend:hover {
@@ -402,37 +608,34 @@
 </head>
 
 <body>
-
     <canvas id="c"></canvas>
-
     <div id="inlogg">
-        <h2>Welcome to HackermanChat</h2>
-        <button id="logOut" class="button red">Logout</button>
-
+        <h2 id="header">Welcome to HackermanChat</h2>
     </div>
-
-
+    <div id="logoutButton">
+        <button id="logOut" class="button red">Logout</button>
+    </div>
     <div id="login">
-
         <h3>Write your hackername to enter our chat.</h3>
-
         <input type="text" placeholder="Username" id="username">
         <button id="enter" class="button">Enter Chat</button><br>
-
+        <img src="github.png" id="enterGithub" class="button">
+        <br>
+        <img src="https://www.htps.us/UserFiles/Servers/Server_791028/Templates/login-google.png" id="enterGmail" class="button">
+        <br>
+        <img src="https://comedydefensivedriving.com/images2011/fb-sign-in-button.png" id="enterFB" class="button">
     </div>
 
     <div class="chatRuta">
         <div id="tva">
             <input id="messageInput" type="text" placeholder="Type your hack...">
-            <button id="sendMessage" class="buttonSend">Send</button>
+            <button id="sendMessage" class="button">Send</button>
         </div>
         <div id="ett">
             <ul id="ul">
             </ul>
         </div>
-
     </div>
-
 </body>
 
 </html>
