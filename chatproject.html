@@ -9,6 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase.js"></script>
     <script>
         window.onload = function() {
+            
             // Initialize Firebase
             var config = {
                 apiKey: "AIzaSyDhTNaNFi_b_CVFA6sdcqAvpjPL_ums0Go",
@@ -50,6 +51,8 @@
 
             let liClass;
             logOut.style.display = "none";
+            
+            
 
             function displayLogIn() {
                 logOut.style.display = "block";
@@ -58,7 +61,6 @@
                 chatRuta.style.display = "block";
                 header.innerText = "Start hacking!";
             }
-
             function displayLogOut() {
                 logOut.style.display = "none";
                 inlogg.style.display = "block";
@@ -66,6 +68,7 @@
                 chatRuta.style.display = "none"
                 header.innerText = "Welcome to HackermanChat";
             }
+            
 
             loginFB.addEventListener("click", function() {
                 firebase.auth().signInWithPopup(fbProvider).then(function(result) {
@@ -129,14 +132,16 @@
             }
 
             function userCheck(userValue) {
-                if (username.value === "") {
-                    alert("That is not a hackername, try again");
-                } else {
+                console.log(userValue)
+//                if (username.value === "") {
+//                    alert("That is not a hackername, try again");
+//                } else{
                     displayLogIn();
                     newUser.name = userValue;
                     myStorage.setItem('name', userValue);
-                    userKey = db.ref("/users/").push(userValue);
-                }
+//                    userKey = db.ref("/users/").push(userValue);
+                    
+//                }
             }
 
             function githubLogout() {
@@ -152,7 +157,7 @@
                 currentUser = firebase.auth().currentUser;
                 if (currentUser === null) {
                     myStorage.removeItem("name");
-                    db.ref('users/' + userKey.key).remove()
+//                    db.ref('users/' + userKey.key).remove()
                     console.log("user removed");
                     displayLogOut();
                 } else if (currentUser.providerData[0].providerId === "github.com") {
@@ -223,6 +228,7 @@
                     // console.log(errorMessage);
                 });
             })
+            
 
             function clickAway() {
                 let theTime = new Date();
@@ -261,7 +267,7 @@
                         text: messageInput.value,
                         time: year + "-" + month + "-" + date + " " + hours + ":" + minutes,
                         photo: "trollface.png",
-                        userId: userKey.key,
+//                        userId: userKey.key,
                     }
                 }
 
@@ -281,17 +287,25 @@
                 }
             })
 
+
             db.ref("/messages").on("child_added", function(snapshot) {
                 let chatting = snapshot.val();
                 let li = document.createElement("li");
                 let img = document.createElement("img");
                 img.src = chatting.photo;
-                img.style.borderRadius = "25px"
+                img.style.borderRadius = "25px";
                 li.innerHTML = `<img src="${chatting.photo}"/><strong>${chatting.who}</strong>&nbsp<em>${chatting.time}</em><br>
             ${chatting.text} `
                 ul.appendChild(li);
             })
 
+            if(myStorage.getItem("name") !== null){
+                userCheck(myStorage.getItem("name"))
+                console.log(myStorage.getItem("name"));
+                username.value = myStorage.getItem("name");
+                displayLogIn();
+}
+            
             /*CANVAS BACKGRGROUND*/
             var c = document.getElementById("c");
             var ctx = c.getContext("2d");
